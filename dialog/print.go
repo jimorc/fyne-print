@@ -1,6 +1,8 @@
 package print
 
 import (
+	"errors"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
@@ -12,12 +14,13 @@ import (
 // PrintDialog implements the print dialog
 type PrintDialog struct {
 	dialog  *dialog.CustomDialog
+	parent  *fyne.Window
 	pSelect *widget.Select
 }
 
 // NewPrintDialog creates a new PrintDialog.
 func NewPrintDialog(parent fyne.Window) *PrintDialog {
-	pDialog := &PrintDialog{}
+	pDialog := &PrintDialog{parent: &parent}
 
 	printerLabel := widget.NewLabel("Printer:")
 	pDialog.pSelect = widget.NewSelect([]string{}, printerChanged)
@@ -49,9 +52,19 @@ func NewPrintDialog(parent fyne.Window) *PrintDialog {
 func (pd PrintDialog) Show() {
 	printers, err := printer.GetPrinters()
 	if err != nil {
-		// show error message
+		error := errors.New("Error detected while trying to retrieve list of available printers:\n" +
+			err.Error())
+		dialog.ShowError(error, *pd.parent)
 	}
 	pd.pSelect.Options = printers
+
+	defaultPrinter, err := printer.GetDefaultPrinter()
+	if err != nil {
+		error := errors.New("Error detected while trying to retrieve the default printer:\n" +
+			err.Error())
+		dialog.ShowError(error, *pd.parent)
+	}
+	pd.pSelect.SetSelected(defaultPrinter)
 	pd.dialog.Show()
 }
 
