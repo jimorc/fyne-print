@@ -6,11 +6,13 @@ import (
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
+	"github.com/jimorc/fyne-print/printer"
 )
 
 // PrintDialog implements the print dialog
 type PrintDialog struct {
-	dialog *dialog.CustomDialog
+	dialog  *dialog.CustomDialog
+	pSelect *widget.Select
 }
 
 // NewPrintDialog creates a new PrintDialog.
@@ -18,13 +20,13 @@ func NewPrintDialog(parent fyne.Window) *PrintDialog {
 	pDialog := &PrintDialog{}
 
 	printerLabel := widget.NewLabel("Printer:")
-	printerSelect := widget.NewSelect([]string{}, printerChanged)
+	pDialog.pSelect = widget.NewSelect([]string{}, printerChanged)
 	locLabel := widget.NewLabel("Location:")
 	location := widget.NewLabel("")
 	typeLabel := widget.NewLabel("Type:")
 	typeLabel.Resize(fyne.NewSize(typeLabel.Size().Width, 12))
 	printerType := widget.NewLabel("")
-	pBox := container.New(layout.NewFormLayout(), printerLabel, printerSelect,
+	pBox := container.New(layout.NewFormLayout(), printerLabel, pDialog.pSelect,
 		locLabel, location, typeLabel, printerType)
 	box := container.NewVBox(pBox)
 	printerCard := widget.NewCard("", "", box)
@@ -45,6 +47,11 @@ func NewPrintDialog(parent fyne.Window) *PrintDialog {
 
 // Show displays the PrintDialog.
 func (pd PrintDialog) Show() {
+	printers, err := printer.GetPrinters()
+	if err != nil {
+		// show error message
+	}
+	pd.pSelect.Options = printers
 	pd.dialog.Show()
 }
 

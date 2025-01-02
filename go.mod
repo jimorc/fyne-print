@@ -2,7 +2,10 @@ module github.com/jimorc/fyne-print
 
 go 1.23.4
 
-require fyne.io/fyne/v2 v2.5.3
+require (
+	fyne.io/fyne/v2 v2.5.3
+	github.com/OpenPrinting/goipp v1.1.0
+)
 
 require (
 	fyne.io/systray v1.11.0 // indirect
