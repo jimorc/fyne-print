@@ -2,6 +2,7 @@ package printer
 
 import (
 	"bytes"
+	"errors"
 	"net/http"
 
 	"github.com/OpenPrinting/goipp"
@@ -28,7 +29,7 @@ func newPrinter(ippGroup *goipp.Group) *Printer {
 
 // Printers contains a slice of Printer objects that represent the printers available on a system.
 type Printers struct {
-	printers []Printer
+	Printers []Printer
 }
 
 // NewPrinters creates a new Printers object containing all of the printers available at that moment
@@ -41,37 +42,58 @@ func NewPrinters() (*Printers, error) {
 	}
 	for _, group := range *groups {
 		printer := newPrinter(&group)
-		p.printers = append(p.printers, *printer)
+		p.AddPrinter(printer)
 	}
 	return p, nil
+}
+
+// Clear clears all of the Printer objects from the Printers object
+func (pd *Printers) Clear() {
+	pd.Printers = []Printer{}
+}
+
+// AddPrinter adds the specified Printer object to the Printers object
+func (pd *Printers) AddPrinter(pr *Printer) {
+	pd.Printers = append(pd.Printers, *pr)
 }
 
 // GetNames retrieves the list of all printer names.
 func (pd *Printers) GetNames() []string {
 	names := []string{}
-	for _, printer := range pd.printers {
+	for _, printer := range pd.Printers {
 		names = append(names, printer.Name)
 	}
 	return names
 }
 
+// GetPrinterIndexByName determines the index of the printer specified by its name
+// in the Printers object.
+func (pd *Printers) GetPrinterIndexByName(name string) (int, error) {
+	for i, pr := range pd.Printers {
+		if pr.Name == name {
+			return i, nil
+		}
+	}
+	return 0, errors.New("Printer not found")
+}
+
 // GetDefaultPrinter retrieves a Printer object representing the default CUPS printer,
 // or nil on error.
-func GetDefaultPrinter() (*Printer, error) {
+func (pd *Printers) GetDefaultPrinter() (int, error) {
 	p := &Printer{}
 	request, err := makeGetDefaultPrinterRequest()
 	if err != nil {
-		return p, err
+		return 0, err
 	}
 	response, err := http.Post(uri, goipp.ContentType, bytes.NewBuffer(request))
 	if err != nil {
-		return p, err
+		return 0, err
 	}
 
 	var respMsg goipp.Message
 	err = respMsg.Decode(response.Body)
 	if err != nil {
-		return p, err
+		return 0, err
 	}
 
 	for _, group := range respMsg.Groups {
@@ -79,7 +101,7 @@ func GetDefaultPrinter() (*Printer, error) {
 			p = newPrinter(&group)
 		}
 	}
-	return p, nil
+	return pd.GetPrinterIndexByName(p.Name)
 }
 
 func getPrinterGroups() (*[]goipp.Group, error) {
