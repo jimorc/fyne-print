@@ -9,6 +9,45 @@ import (
 
 const uri = "http://localhost:631"
 
+type Printer struct {
+	Name string
+}
+
+func newPrinter(ippGroup *goipp.Group) *Printer {
+	p := &Printer{}
+	for _, attr := range ippGroup.Attrs {
+		if attr.Name == "printer-name" {
+			p.Name = attr.Values.String()
+		}
+	}
+	return p
+}
+
+type Printers struct {
+	printers []Printer
+}
+
+func NewPrinters() (*Printers, error) {
+	p := &Printers{}
+	groups, err := getPrinterGroups()
+	if err != nil {
+		return p, err
+	}
+	for _, group := range *groups {
+		printer := newPrinter(&group)
+		p.printers = append(p.printers, *printer)
+	}
+	return p, nil
+}
+
+func (pd *Printers) GetNames() []string {
+	names := []string{}
+	for _, printer := range pd.printers {
+		names = append(names, printer.Name)
+	}
+	return names
+}
+
 // GetDefaultPrinter retrieves the name of the default CUPS printer, or nil
 func GetDefaultPrinter() (string, error) {
 	request, err := makeGetDefaultPrinterRequest()
@@ -36,34 +75,29 @@ func GetDefaultPrinter() (string, error) {
 }
 
 // GetPrinters retrieves a slice containing the names of available CUPS printers.
-func GetPrinters() ([]string, error) {
+func getPrinterGroups() (*[]goipp.Group, error) {
+	groups := &[]goipp.Group{}
 	request, err := makeGetPrintersRequest()
 	if err != nil {
-		return nil, err
+		return groups, err
 	}
 	response, err := http.Post(uri, goipp.ContentType, bytes.NewBuffer(request))
 	if err != nil {
-		return nil, err
+		return groups, err
 	}
 
 	var respMsg goipp.Message
 	err = respMsg.Decode(response.Body)
 	if err != nil {
-		return nil, err
+		return groups, err
 	}
 
-	var printerNames []string
-	//	respMsg.Print(os.Stdout, false)
 	for _, group := range respMsg.Groups {
 		if group.Tag == goipp.TagPrinterGroup {
-			for _, attr := range group.Attrs {
-				if attr.Name == "printer-name" {
-					printerNames = append(printerNames, attr.Values.String())
-				}
-			}
+			*groups = append(*groups, group)
 		}
 	}
-	return printerNames, nil
+	return groups, nil
 }
 
 func makeGetPrintersRequest() ([]byte, error) {

@@ -16,6 +16,8 @@ type PrintDialog struct {
 	dialog  *dialog.CustomDialog
 	parent  *fyne.Window
 	pSelect *widget.Select
+
+	printers *printer.Printers
 }
 
 // NewPrintDialog creates a new PrintDialog.
@@ -49,14 +51,15 @@ func NewPrintDialog(parent fyne.Window) *PrintDialog {
 }
 
 // Show displays the PrintDialog.
-func (pd PrintDialog) Show() {
-	printers, err := printer.GetPrinters()
+func (pd *PrintDialog) Show() {
+	printers, err := printer.NewPrinters()
 	if err != nil {
 		error := errors.New("Error detected while trying to retrieve list of available printers:\n" +
 			err.Error())
 		dialog.ShowError(error, *pd.parent)
 	}
-	pd.pSelect.Options = printers
+	pd.printers = printers
+	pd.pSelect.Options = pd.printers.GetNames()
 
 	defaultPrinter, err := printer.GetDefaultPrinter()
 	if err != nil {
