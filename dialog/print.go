@@ -11,14 +11,21 @@ import (
 	"github.com/jimorc/fyne-print/printer"
 )
 
-// PrintDialog implements the print dialog
-type PrintDialog struct {
+// InfoDialog implements the printer info dialog.
+// It is displayed when the Info button on the Print Dialog is clicked.
+type InfoDialog struct {
 	dialog       *dialog.CustomDialog
-	parent       *fyne.Window
-	pSelect      *widget.Select
 	location     *widget.Label
 	printerModel *widget.Label
 	uri          *widget.Label
+}
+
+// PrintDialog implements the print dialog
+type PrintDialog struct {
+	dialog     *dialog.CustomDialog
+	parent     *fyne.Window
+	infoDialog *InfoDialog
+	pSelect    *widget.Select
 
 	printers            printer.Printers
 	activePrinterNumber int
@@ -30,15 +37,9 @@ func NewPrintDialog(parent fyne.Window) *PrintDialog {
 
 	printerLabel := widget.NewLabel("Printer:")
 	pDialog.pSelect = widget.NewSelect([]string{}, pDialog.printerChanged)
-	locLabel := widget.NewLabel("Location:")
-	pDialog.location = widget.NewLabel("")
-	modelLabel := widget.NewLabel("Type:")
-	modelLabel.Resize(fyne.NewSize(modelLabel.Size().Width, 12))
-	pDialog.printerModel = widget.NewLabel("")
-	uriLabel := widget.NewLabel("URI:")
-	pDialog.uri = widget.NewLabel("")
-	pBox := container.New(layout.NewFormLayout(), printerLabel, pDialog.pSelect,
-		locLabel, pDialog.location, modelLabel, pDialog.printerModel, uriLabel, pDialog.uri)
+	infoButton := widget.NewButton("Info", pDialog.infoClicked)
+	pSelInfo := container.NewBorder(nil, nil, nil, infoButton, pDialog.pSelect)
+	pBox := container.New(layout.NewFormLayout(), printerLabel, pSelInfo)
 	box := container.NewVBox(pBox)
 	printerCard := widget.NewCard("", "", box)
 	bOptions := widget.NewButton("Options >>", optionsClicked)
@@ -78,6 +79,11 @@ func (pd *PrintDialog) Show() {
 	pd.dialog.Show()
 }
 
+func (pD *PrintDialog) infoClicked() {
+	pD.infoDialog = pD.makeInfoDialog()
+	pD.infoDialog.dialog.Show()
+}
+
 func optionsClicked() {}
 
 func printClicked() {}
@@ -95,9 +101,27 @@ func (pD *PrintDialog) printerChanged(printerName string) {
 		return
 	}
 	pD.activePrinterNumber = index
-	pD.location.Text = pD.printers.Printers[pD.activePrinterNumber].Location
-	pD.printerModel.Text = pD.printers.Printers[pD.activePrinterNumber].Model
-	pD.uri.Text = pD.printers.Printers[pD.activePrinterNumber].Uri
-	pD.location.Refresh()
-	pD.printerModel.Refresh()
+}
+
+func (pD *PrintDialog) makeInfoDialog() *InfoDialog {
+	iD := &InfoDialog{}
+	printerLabel := widget.NewLabel("Printer:")
+	printerName := widget.NewLabel(pD.pSelect.Selected)
+	locLabel := widget.NewLabel("Location:")
+	iD.location = widget.NewLabel("")
+	modelLabel := widget.NewLabel("Type:")
+	//	iD.modelLabel.Resize(fyne.NewSize(modelLabel.Size().Width, 12))
+	iD.printerModel = widget.NewLabel("")
+	uriLabel := widget.NewLabel("URI:")
+	iD.uri = widget.NewLabel("")
+	infoBox := container.New(layout.NewFormLayout(), printerLabel, printerName,
+		locLabel, iD.location, modelLabel, iD.printerModel,
+		uriLabel, iD.uri)
+
+	iD.location.Text = pD.printers.Printers[pD.activePrinterNumber].Location
+	iD.printerModel.Text = pD.printers.Printers[pD.activePrinterNumber].Model
+	iD.uri.Text = pD.printers.Printers[pD.activePrinterNumber].Uri
+
+	iD.dialog = dialog.NewCustom("Printer Information", "OK", infoBox, *pD.parent)
+	return iD
 }
