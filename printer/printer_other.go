@@ -9,10 +9,13 @@ import (
 
 const uri = "http://localhost:631"
 
+// Printer contains a number of printer properties. This struct will make interacting with the
+// printer easier as functionality is added.
 type Printer struct {
 	Name string
 }
 
+// newPrinter creates a new Printer object from goipp.Group data.
 func newPrinter(ippGroup *goipp.Group) *Printer {
 	p := &Printer{}
 	for _, attr := range ippGroup.Attrs {
@@ -23,10 +26,13 @@ func newPrinter(ippGroup *goipp.Group) *Printer {
 	return p
 }
 
+// Printers contains a slice of Printer objects that represent the printers available on a system.
 type Printers struct {
 	printers []Printer
 }
 
+// NewPrinters creates a new Printers object containing all of the printers available at that moment
+// on the system.
 func NewPrinters() (*Printers, error) {
 	p := &Printers{}
 	groups, err := getPrinterGroups()
@@ -40,6 +46,7 @@ func NewPrinters() (*Printers, error) {
 	return p, nil
 }
 
+// GetNames retrieves the list of all printer names.
 func (pd *Printers) GetNames() []string {
 	names := []string{}
 	for _, printer := range pd.printers {
