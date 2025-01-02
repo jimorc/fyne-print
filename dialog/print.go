@@ -18,6 +18,7 @@ type PrintDialog struct {
 	pSelect      *widget.Select
 	location     *widget.Label
 	printerModel *widget.Label
+	uri          *widget.Label
 
 	printers            printer.Printers
 	activePrinterNumber int
@@ -34,8 +35,10 @@ func NewPrintDialog(parent fyne.Window) *PrintDialog {
 	modelLabel := widget.NewLabel("Type:")
 	modelLabel.Resize(fyne.NewSize(modelLabel.Size().Width, 12))
 	pDialog.printerModel = widget.NewLabel("")
+	uriLabel := widget.NewLabel("URI:")
+	pDialog.uri = widget.NewLabel("")
 	pBox := container.New(layout.NewFormLayout(), printerLabel, pDialog.pSelect,
-		locLabel, pDialog.location, modelLabel, pDialog.printerModel)
+		locLabel, pDialog.location, modelLabel, pDialog.printerModel, uriLabel, pDialog.uri)
 	box := container.NewVBox(pBox)
 	printerCard := widget.NewCard("", "", box)
 	bOptions := widget.NewButton("Options >>", optionsClicked)
@@ -94,6 +97,7 @@ func (pD *PrintDialog) printerChanged(printerName string) {
 	pD.activePrinterNumber = index
 	pD.location.Text = pD.printers.Printers[pD.activePrinterNumber].Location
 	pD.printerModel.Text = pD.printers.Printers[pD.activePrinterNumber].Model
+	pD.uri.Text = pD.printers.Printers[pD.activePrinterNumber].Uri
 	pD.location.Refresh()
 	pD.printerModel.Refresh()
 }

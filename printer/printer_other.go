@@ -3,6 +3,7 @@ package printer
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/OpenPrinting/goipp"
@@ -16,12 +17,14 @@ type Printer struct {
 	Name     string
 	Location string
 	Model    string
+	Uri      string
 }
 
 // newPrinter creates a new Printer object from goipp.Group data.
 func newPrinter(ippGroup *goipp.Group) *Printer {
 	p := &Printer{}
 	for _, attr := range ippGroup.Attrs {
+		//		fmt.Println(attr)
 		if attr.Name == "printer-name" {
 			p.Name = attr.Values.String()
 		}
@@ -30,6 +33,13 @@ func newPrinter(ippGroup *goipp.Group) *Printer {
 		}
 		if attr.Name == "printer-make-and-model" {
 			p.Model = attr.Values.String()
+		}
+		if attr.Name == "printer-uri" {
+			p.Uri = attr.Values.String()
+			fmt.Printf("URI: %v\n", attr.Values.String())
+		}
+		if attr.Name == "printer-uri-supported" && p.Uri == "" {
+			p.Uri = attr.Values.String()
 		}
 	}
 	return p
