@@ -17,7 +17,8 @@ type PrintDialog struct {
 	parent  *fyne.Window
 	pSelect *widget.Select
 
-	printers *printer.Printers
+	printers      *printer.Printers
+	activePrinter *printer.Printer
 }
 
 // NewPrintDialog creates a new PrintDialog.
@@ -62,12 +63,13 @@ func (pd *PrintDialog) Show() {
 	pd.pSelect.Options = pd.printers.GetNames()
 
 	defaultPrinter, err := printer.GetDefaultPrinter()
+	pd.activePrinter = defaultPrinter
 	if err != nil {
 		error := errors.New("Error detected while trying to retrieve the default printer:\n" +
 			err.Error())
 		dialog.ShowError(error, *pd.parent)
 	}
-	pd.pSelect.SetSelected(defaultPrinter)
+	pd.pSelect.SetSelected(defaultPrinter.Name)
 	pd.dialog.Show()
 }
 

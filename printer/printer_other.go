@@ -55,33 +55,33 @@ func (pd *Printers) GetNames() []string {
 	return names
 }
 
-// GetDefaultPrinter retrieves the name of the default CUPS printer, or nil
-func GetDefaultPrinter() (string, error) {
+// GetDefaultPrinter retrieves a Printer object representing the default CUPS printer,
+// or nil on error.
+func GetDefaultPrinter() (*Printer, error) {
+	p := &Printer{}
 	request, err := makeGetDefaultPrinterRequest()
 	if err != nil {
-		return "", err
+		return p, err
 	}
 	response, err := http.Post(uri, goipp.ContentType, bytes.NewBuffer(request))
 	if err != nil {
-		return "", err
+		return p, err
 	}
 
 	var respMsg goipp.Message
 	err = respMsg.Decode(response.Body)
 	if err != nil {
-		return "", err
+		return p, err
 	}
 
-	for _, attr := range respMsg.Printer {
-		if attr.Name == "printer-name" {
-			return attr.Values.String(), nil
+	for _, group := range respMsg.Groups {
+		if group.Tag == goipp.TagPrinterGroup {
+			p = newPrinter(&group)
 		}
 	}
-
-	return "", nil
+	return p, nil
 }
 
-// GetPrinters retrieves a slice containing the names of available CUPS printers.
 func getPrinterGroups() (*[]goipp.Group, error) {
 	groups := &[]goipp.Group{}
 	request, err := makeGetPrintersRequest()
