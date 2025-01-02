@@ -13,10 +13,11 @@ import (
 
 // PrintDialog implements the print dialog
 type PrintDialog struct {
-	dialog   *dialog.CustomDialog
-	parent   *fyne.Window
-	pSelect  *widget.Select
-	location *widget.Label
+	dialog       *dialog.CustomDialog
+	parent       *fyne.Window
+	pSelect      *widget.Select
+	location     *widget.Label
+	printerModel *widget.Label
 
 	printers            printer.Printers
 	activePrinterNumber int
@@ -30,11 +31,11 @@ func NewPrintDialog(parent fyne.Window) *PrintDialog {
 	pDialog.pSelect = widget.NewSelect([]string{}, pDialog.printerChanged)
 	locLabel := widget.NewLabel("Location:")
 	pDialog.location = widget.NewLabel("")
-	typeLabel := widget.NewLabel("Type:")
-	typeLabel.Resize(fyne.NewSize(typeLabel.Size().Width, 12))
-	printerType := widget.NewLabel("")
+	modelLabel := widget.NewLabel("Type:")
+	modelLabel.Resize(fyne.NewSize(modelLabel.Size().Width, 12))
+	pDialog.printerModel = widget.NewLabel("")
 	pBox := container.New(layout.NewFormLayout(), printerLabel, pDialog.pSelect,
-		locLabel, pDialog.location, typeLabel, printerType)
+		locLabel, pDialog.location, modelLabel, pDialog.printerModel)
 	box := container.NewVBox(pBox)
 	printerCard := widget.NewCard("", "", box)
 	bOptions := widget.NewButton("Options >>", optionsClicked)
@@ -82,6 +83,17 @@ func (pD *PrintDialog) cancelClicked() {
 	pD.dialog.Hide()
 }
 
-func (pD *PrintDialog) printerChanged(printer string) {
+func (pD *PrintDialog) printerChanged(printerName string) {
+	index, err := pD.printers.GetPrinterIndexByName((printerName))
+	if err != nil {
+		error := errors.New("Error detected attempting to retrieve the selected printer:\n" +
+			err.Error())
+		dialog.ShowError(error, *pD.parent)
+		return
+	}
+	pD.activePrinterNumber = index
 	pD.location.Text = pD.printers.Printers[pD.activePrinterNumber].Location
+	pD.printerModel.Text = pD.printers.Printers[pD.activePrinterNumber].Model
+	pD.location.Refresh()
+	pD.printerModel.Refresh()
 }

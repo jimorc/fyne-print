@@ -15,6 +15,7 @@ const uri = "http://localhost:631"
 type Printer struct {
 	Name     string
 	Location string
+	Model    string
 }
 
 // newPrinter creates a new Printer object from goipp.Group data.
@@ -26,6 +27,9 @@ func newPrinter(ippGroup *goipp.Group) *Printer {
 		}
 		if attr.Name == "printer-location" {
 			p.Location = attr.Values.String()
+		}
+		if attr.Name == "printer-make-and-model" {
+			p.Model = attr.Values.String()
 		}
 	}
 	return p
