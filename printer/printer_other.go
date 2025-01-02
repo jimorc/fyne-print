@@ -13,7 +13,8 @@ const uri = "http://localhost:631"
 // Printer contains a number of printer properties. This struct will make interacting with the
 // printer easier as functionality is added.
 type Printer struct {
-	Name string
+	Name     string
+	Location string
 }
 
 // newPrinter creates a new Printer object from goipp.Group data.
@@ -22,6 +23,9 @@ func newPrinter(ippGroup *goipp.Group) *Printer {
 	for _, attr := range ippGroup.Attrs {
 		if attr.Name == "printer-name" {
 			p.Name = attr.Values.String()
+		}
+		if attr.Name == "printer-location" {
+			p.Location = attr.Values.String()
 		}
 	}
 	return p

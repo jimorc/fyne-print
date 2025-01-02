@@ -13,9 +13,10 @@ import (
 
 // PrintDialog implements the print dialog
 type PrintDialog struct {
-	dialog  *dialog.CustomDialog
-	parent  *fyne.Window
-	pSelect *widget.Select
+	dialog   *dialog.CustomDialog
+	parent   *fyne.Window
+	pSelect  *widget.Select
+	location *widget.Label
 
 	printers            printer.Printers
 	activePrinterNumber int
@@ -26,14 +27,14 @@ func NewPrintDialog(parent fyne.Window) *PrintDialog {
 	pDialog := &PrintDialog{parent: &parent}
 
 	printerLabel := widget.NewLabel("Printer:")
-	pDialog.pSelect = widget.NewSelect([]string{}, printerChanged)
+	pDialog.pSelect = widget.NewSelect([]string{}, pDialog.printerChanged)
 	locLabel := widget.NewLabel("Location:")
-	location := widget.NewLabel("")
+	pDialog.location = widget.NewLabel("")
 	typeLabel := widget.NewLabel("Type:")
 	typeLabel.Resize(fyne.NewSize(typeLabel.Size().Width, 12))
 	printerType := widget.NewLabel("")
 	pBox := container.New(layout.NewFormLayout(), printerLabel, pDialog.pSelect,
-		locLabel, location, typeLabel, printerType)
+		locLabel, pDialog.location, typeLabel, printerType)
 	box := container.NewVBox(pBox)
 	printerCard := widget.NewCard("", "", box)
 	bOptions := widget.NewButton("Options >>", optionsClicked)
@@ -81,4 +82,6 @@ func (pD *PrintDialog) cancelClicked() {
 	pD.dialog.Hide()
 }
 
-func printerChanged(printer string) {}
+func (pD *PrintDialog) printerChanged(printer string) {
+	pD.location.Text = pD.printers.Printers[pD.activePrinterNumber].Location
+}
