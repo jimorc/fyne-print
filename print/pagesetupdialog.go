@@ -1,6 +1,8 @@
 package print
 
 import (
+	"errors"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
@@ -10,6 +12,7 @@ import (
 // PageSetupDialog is a ConfirmDialog dialog with widgets that must be saved.
 type PageSetupDialog struct {
 	*dialog.ConfirmDialog
+	parent        fyne.Window
 	printerSelect *widget.Select
 }
 
@@ -22,6 +25,7 @@ var pageSetupDialog *PageSetupDialog = &PageSetupDialog{}
 //
 //	parent is the parent window for the dialog.
 func NewPageSetupDialog(parent fyne.Window) *dialog.ConfirmDialog {
+	pageSetupDialog.parent = parent
 	printerContainer := pageSetupDialog.createPrinterContainer()
 
 	box := container.NewVBox(printerContainer)
@@ -38,6 +42,21 @@ func (psd *PageSetupDialog) createPrinterContainer() *fyne.Container {
 	label := widget.NewLabel("Format For")
 	psd.printerSelect = widget.NewSelect([]string{}, nil)
 	psd.printerSelect.Resize(fyne.NewSize(250, psd.printerSelect.Size().Height))
+	psd.populatePrinterSelect(psd.parent)
 	c := container.NewBorder(nil, nil, label, psd.printerSelect)
 	return c
+}
+
+func (psd *PageSetupDialog) populatePrinterSelect(parent fyne.Window) {
+	printers, err := newPrinters()
+	if err != nil {
+		fyne.LogError("Error retrieving printers", err)
+		err1 := errors.New("Error retrieving list of printers:\n" +
+			err.Error() +
+			"\nCannot continue page setup.")
+		dialog.ShowError(err1, parent)
+		return
+	}
+	prNames := printers.getNames()
+	psd.printerSelect.Options = prNames
 }

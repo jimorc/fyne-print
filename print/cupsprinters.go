@@ -10,6 +10,15 @@ type Printers struct {
 	printers []Printer
 }
 
+// getNames retrieves the list of all printer names.
+func (p *Printers) getNames() []string {
+	names := []string{}
+	for _, printer := range p.printers {
+		names = append(names, printer.Name())
+	}
+	return names
+}
+
 // addPrinter adds a Printer object to the Printers object.
 func (p *Printers) addPrinter(pr *Printer) {
 	p.printers = append(p.printers, *pr)
