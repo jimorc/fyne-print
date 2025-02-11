@@ -1,6 +1,8 @@
 package print
 
 import (
+	"fmt"
+
 	"fyne.io/fyne/v2"
 	"github.com/OpenPrinting/goipp"
 )
@@ -17,6 +19,26 @@ func (p *Printers) getNames() []string {
 		names = append(names, printer.Name())
 	}
 	return names
+}
+
+// getPrinterIndexByName returns the index of the printer within the printers
+// object that has the specified name.
+//
+// Params:
+//
+//	name is the name of the printer to find.
+//
+// Returns:
+//
+//	index of the matching printer within the Printers object, or -1 on error.
+//	error if matching printer is not found, or nil if found.
+func (p *Printers) getPrinterIndexByName(name string) (int, error) {
+	for i, pr := range p.printers {
+		if pr.Name() == name {
+			return i, nil
+		}
+	}
+	return -1, fmt.Errorf("Printer with name: \"%s\" not found", name)
 }
 
 // addPrinter adds a Printer object to the Printers object.
