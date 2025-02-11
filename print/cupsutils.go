@@ -10,6 +10,8 @@ import (
 	"github.com/OpenPrinting/goipp"
 )
 
+const localCupsURI = "http://localhost:631"
+
 // createGroupsFromMessage parses a goipp.Message and returns a slice of all
 // goipp.Group objects in the message.
 func createGroupsFromMessage(message *goipp.Message) (*[]goipp.Group, error) {

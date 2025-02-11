@@ -10,6 +10,7 @@ import (
 )
 
 func TestCreateGroupsFromMessage(t *testing.T) {
+	_, _ = getResponseGroups(goipp.OpCupsGetPrinters, localCupsURI, "all")
 	msg := createGetPrintersResponse()
 	groups, err := createGroupsFromMessage(msg)
 	assert.Nil(t, err)
@@ -69,6 +70,8 @@ func createGetPrintersResponse() *goipp.Message {
 		goipp.TagDateTime, goipp.Time{now}))
 	prAttrs.Add(goipp.MakeAttribute("printer-change-time",
 		goipp.TagInteger, goipp.Integer(1739223363)))
+	prAttrs.Add(goipp.MakeAttribute("printer-name",
+		goipp.TagName, goipp.String("Printer1")))
 
 	prAttributesGroup := goipp.Group{Tag: goipp.TagPrinterGroup, Attrs: prAttrs}
 	m.Groups.Add(prAttributesGroup)
