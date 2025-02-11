@@ -11,7 +11,7 @@ import (
 
 func TestCreateGroupsFromMessage(t *testing.T) {
 	_, _ = getResponseGroups(goipp.OpCupsGetPrinters, localCupsURI, "all")
-	msg := createGetPrintersResponse()
+	msg := createTestPrintersResponse()
 	groups, err := createGroupsFromMessage(msg)
 	assert.Nil(t, err)
 	assert.Equal(t, goipp.TagOperationGroup, (*groups)[0].Tag)
@@ -28,7 +28,7 @@ func TestGetResponseGroups_BadURI(t *testing.T) {
 
 }
 
-func createGetPrintersResponse() *goipp.Message {
+func createTestPrintersResponse() *goipp.Message {
 	now := time.Now().UTC()
 	m := goipp.NewResponse(goipp.DefaultVersion, 200, 1)
 	operationAttrs := goipp.Attributes{}

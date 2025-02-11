@@ -9,7 +9,7 @@ import (
 
 func TestNewPrinter(t *testing.T) {
 	var pr *Printer
-	msg := createGetPrintersResponse()
+	msg := createTestPrintersResponse()
 	groups, err := createGroupsFromMessage(msg)
 	assert.Nil(t, err)
 	for _, group := range *groups {

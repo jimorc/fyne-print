@@ -7,7 +7,7 @@ import (
 )
 
 func TestNewPrintersFromGroups(t *testing.T) {
-	msg := createGetPrintersResponse()
+	msg := createTestPrintersResponse()
 	groups, err := createGroupsFromMessage(msg)
 	assert.Nil(t, err)
 
@@ -16,7 +16,7 @@ func TestNewPrintersFromGroups(t *testing.T) {
 }
 
 func TestGetPrinterIndexByName(t *testing.T) {
-	msg := createGetPrintersResponse()
+	msg := createTestPrintersResponse()
 	groups, err := createGroupsFromMessage(msg)
 	assert.Nil(t, err)
 
