@@ -8,6 +8,7 @@ type Printer struct {
 	name string
 }
 
+// newPrinter creates a Printer object based on CUPS ipp group info.
 func newPrinter(ippGroup goipp.Group) *Printer {
 	pr := &Printer{}
 	for _, attr := range ippGroup.Attrs {
