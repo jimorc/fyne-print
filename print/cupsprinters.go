@@ -28,17 +28,25 @@ func (p *Printers) addPrinter(pr *Printer) {
 // It then creates a Printer object for every printer for which
 // info was returned.
 func newPrinters() (*Printers, error) {
-	p := &Printers{}
 	groups, err := getResponseGroups(goipp.OpCupsGetPrinters,
 		localCupsURI, "all")
 	if err != nil {
 		fyne.LogError("Error getting CUPS printers", err)
+		return &Printers{}, err
 	}
+	p := newPrintersFromGroups(groups)
+	return p, nil
+}
+
+// newPrintersFromGroups creates a Printers object for the each printer
+// specified in an IPP printer group.
+func newPrintersFromGroups(groups *[]goipp.Group) *Printers {
+	p := &Printers{}
 	for _, group := range *groups {
 		if group.Tag == goipp.TagPrinterGroup {
 			pr := newPrinter(group)
 			p.addPrinter(pr)
 		}
 	}
-	return p, err
+	return p
 }
