@@ -25,6 +25,10 @@ func TestGetPrinterIndexByName(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, 0, index)
 
+	index, err = p.getPrinterIndexByName("Printer2")
+	assert.Nil(t, err)
+	assert.Equal(t, 1, index)
+
 	index, err = p.getPrinterIndexByName("Printer16")
 	assert.NotNil(t, err)
 	assert.Equal(t, -1, index)
