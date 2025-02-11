@@ -10,8 +10,17 @@ import (
 func main() {
 	a := app.New()
 	w := a.NewWindow("One Page Print")
-	pSetup := print.NewPageSetupDialog(w)
-	pSetup.Show()
+	fileMenu := fyne.NewMenu("File",
+		fyne.NewMenuItem("Page Setup", func() {
+			pSetup := print.NewPageSetupDialog(w)
+			pSetup.Show()
+		}),
+		fyne.NewMenuItem("Quit", func() {
+			w.Close()
+		}))
+
+	mainMenu := fyne.NewMainMenu(fileMenu)
+	w.SetMainMenu(mainMenu)
 	w.Resize(fyne.NewSize(800, 600))
 	w.ShowAndRun()
 }
