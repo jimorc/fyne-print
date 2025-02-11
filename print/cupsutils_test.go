@@ -76,5 +76,42 @@ func createTestPrintersResponse() *goipp.Message {
 	prAttributesGroup := goipp.Group{Tag: goipp.TagPrinterGroup, Attrs: prAttrs}
 	m.Groups.Add(prAttributesGroup)
 
+	pr1Attrs := goipp.Attributes{}
+	pr1Attrs.Add(goipp.MakeAttribute("marker-change-time",
+		goipp.TagInteger, goipp.Integer(0)))
+	pr1Attrs.Add(goipp.MakeAttribute("printer-config-change-date-time",
+		goipp.TagDateTime, goipp.Time{now}))
+	pr1Attrs.Add(goipp.MakeAttribute("printer-config-change-time",
+		goipp.TagInteger, goipp.Integer(1739223365)))
+	pr1Attrs.Add(goipp.MakeAttribute("printer-dns-sd-name",
+		goipp.TagNoValue, goipp.Void{}))
+	pr1Attrs.Add(goipp.MakeAttribute("printer-error-policy",
+		goipp.TagName, goipp.String("retry-job")))
+	pr1Attrs.Add(goipp.MakeAttribute("printer-error-policy-supported",
+		goipp.TagName, goipp.String("abort-job retry-current-job retry-job stop-printer")))
+	pr1Attrs.Add(goipp.MakeAttribute("printer-icons",
+		goipp.TagURI, goipp.String("http://localhost:631/icons/Printer2.png")))
+	pr1Attrs.Add(goipp.MakeAttribute("printer-is-accepting-jobs",
+		goipp.TagBoolean, goipp.Boolean(true)))
+	pr1Attrs.Add(goipp.MakeAttribute("printer-is-shared",
+		goipp.TagBoolean, goipp.Boolean(false)))
+	pr1Attrs.Add(goipp.MakeAttribute("printer-is-temporary",
+		goipp.TagBoolean, goipp.Boolean(false)))
+	pr1Attrs.Add(goipp.MakeAttribute("printer-more-info",
+		goipp.TagURI, goipp.String("http://localhost:631/printers/Printer2")))
+	pr1Attrs.Add(goipp.MakeAttribute("printer-op-policy",
+		goipp.TagName, goipp.String("default")))
+	pr1Attrs.Add(goipp.MakeAttribute("printer-state",
+		goipp.TagEnum, goipp.Integer(3)))
+	pr1Attrs.Add(goipp.MakeAttribute("printer-state-change-date-time",
+		goipp.TagDateTime, goipp.Time{now}))
+	pr1Attrs.Add(goipp.MakeAttribute("printer-change-time",
+		goipp.TagInteger, goipp.Integer(1739223363)))
+	pr1Attrs.Add(goipp.MakeAttribute("printer-name",
+		goipp.TagName, goipp.String("Printer2")))
+
+	pr1AttributesGroup := goipp.Group{Tag: goipp.TagPrinterGroup, Attrs: pr1Attrs}
+	m.Groups.Add(pr1AttributesGroup)
+
 	return m
 }
