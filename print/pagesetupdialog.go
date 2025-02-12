@@ -32,7 +32,7 @@ func NewPageSetupDialog(parent fyne.Window) *dialog.ConfirmDialog {
 
 	pageSetupDialog.ConfirmDialog = dialog.NewCustomConfirm("PageSetup", "OK",
 		"Cancel", box, func(bool) {}, parent)
-
+	pageSetupDialog.Resize(fyne.NewSize(500, 300))
 	return pageSetupDialog.ConfirmDialog
 
 }
@@ -41,9 +41,8 @@ func NewPageSetupDialog(parent fyne.Window) *dialog.ConfirmDialog {
 func (psd *PageSetupDialog) createPrinterContainer() *fyne.Container {
 	label := widget.NewLabel("Format For")
 	psd.printerSelect = widget.NewSelect([]string{}, nil)
-	psd.printerSelect.Resize(fyne.NewSize(250, psd.printerSelect.Size().Height))
 	psd.populatePrinterSelect(psd.parent)
-	c := container.NewBorder(nil, nil, label, psd.printerSelect)
+	c := container.NewBorder(nil, nil, label, nil, psd.printerSelect)
 	return c
 }
 
@@ -59,4 +58,16 @@ func (psd *PageSetupDialog) populatePrinterSelect(parent fyne.Window) {
 	}
 	prNames := printers.getNames()
 	psd.printerSelect.Options = prNames
+
+	// Decide which printer to select, if any.
+	// Not really the correct place to do this, but we already have retrieved
+	// the printers and we need access to the Printers object.
+	if len(printers.printers) == 1 {
+		psd.printerSelect.SetSelectedIndex(0)
+	} else {
+		defaultPrinter := printers.getDefaultPrinter()
+		if defaultPrinter != -1 {
+			psd.printerSelect.SetSelectedIndex(defaultPrinter)
+		}
+	}
 }

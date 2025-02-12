@@ -12,6 +12,26 @@ type Printers struct {
 	printers []Printer
 }
 
+// getDefaultPrinterIndex returns the index of the default printer
+// in the Printers object, or -1 if there is no default printer.
+func (p *Printers) getDefaultPrinter() int {
+	index := -1
+	groups, err := getResponseGroups(goipp.OpCupsGetDefault,
+		localCupsURI, "printer-name")
+	if err != nil {
+		fyne.LogError("Error getting default CUPS printer", err)
+		return index
+	}
+	for _, group := range *groups {
+		if group.Tag == goipp.TagPrinterGroup {
+			pr := newPrinter(group)
+			index, _ = p.getPrinterIndexByName(pr.Name())
+			return index
+		}
+	}
+	return index
+}
+
 // getNames retrieves the list of all printer names.
 func (p *Printers) getNames() []string {
 	names := []string{}
