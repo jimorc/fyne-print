@@ -4,7 +4,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 
-	"github.com/jimorc/fyne-print"
+	"github.com/jimorc/fyne-print/print"
 )
 
 func main() {
