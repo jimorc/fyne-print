@@ -1,6 +1,13 @@
+//go:build !windows
+
 package print
 
-/*
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
+
 func TestNewPrintersFromGroups(t *testing.T) {
 	msg := createTestPrintersResponse()
 	groups, err := createGroupsFromMessage(msg)
@@ -28,4 +35,3 @@ func TestGetPrinterIndexByName(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, -1, index)
 }
-*/
