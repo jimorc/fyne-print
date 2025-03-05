@@ -71,16 +71,4 @@ func (psd *PageSetupDialog) populatePrinterSelect(parent fyne.Window) {
 	}
 	prNames := printers.getNames()
 	psd.printerSelect.Options = prNames
-
-	// Decide which printer to select, if any.
-	// Not really the correct place to do this, but we already have retrieved
-	// the printers and we need access to the Printers object.
-	if len(printers.Printers) == 1 {
-		psd.printerSelect.SetSelectedIndex(0)
-	} else {
-		defaultPrinter := printers.GetDefaultPrinter()
-		if defaultPrinter != -1 {
-			psd.printerSelect.SetSelectedIndex(defaultPrinter)
-		}
-	}
 }
