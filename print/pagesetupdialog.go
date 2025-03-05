@@ -7,13 +7,16 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
+	xlayout "fyne.io/x/fyne/layout"
 )
 
 // PageSetupDialog is a ConfirmDialog dialog with widgets that must be saved.
 type PageSetupDialog struct {
 	*dialog.ConfirmDialog
-	parent        fyne.Window
-	printerSelect *widget.Select
+	parent                fyne.Window
+	printerSelect         *widget.Select
+	paperSizeSelect       *widget.Select
+	orientationRadioGroup *widget.RadioGroup
 }
 
 // create a PageSetupDialog.
@@ -28,10 +31,10 @@ func NewPageSetupDialog(parent fyne.Window) *dialog.ConfirmDialog {
 	pageSetupDialog.parent = parent
 	printerContainer := pageSetupDialog.createPrinterContainer()
 
-	box := container.NewVBox(printerContainer)
+	//	box := container.NewVBox(printerContainer)
 
 	pageSetupDialog.ConfirmDialog = dialog.NewCustomConfirm("PageSetup", "OK",
-		"Cancel", box, func(bool) {}, parent)
+		"Cancel", printerContainer, func(bool) {}, parent)
 	pageSetupDialog.Resize(fyne.NewSize(500, 300))
 	return pageSetupDialog.ConfirmDialog
 
@@ -39,11 +42,21 @@ func NewPageSetupDialog(parent fyne.Window) *dialog.ConfirmDialog {
 
 // createPrinterContainer creates the container that holds the printers select and label.
 func (psd *PageSetupDialog) createPrinterContainer() *fyne.Container {
-	label := widget.NewLabel("Format For")
+	prLabel := widget.NewLabel("Format For")
 	psd.printerSelect = widget.NewSelect([]string{}, nil)
+	psd.printerSelect.Alignment = fyne.TextAlignTrailing
+	psLabel := widget.NewLabel("Paper Size")
+	psd.paperSizeSelect = widget.NewSelect([]string{}, nil)
+	psd.paperSizeSelect.Alignment = fyne.TextAlignTrailing
+	orLabel := widget.NewLabel("Orientation")
+	psd.orientationRadioGroup = widget.NewRadioGroup([]string{"Portrait", "Landscape"}, nil)
+	psd.orientationRadioGroup.Horizontal = true
 	psd.populatePrinterSelect(psd.parent)
-	c := container.NewBorder(nil, nil, label, nil, psd.printerSelect)
-	return c
+	prC := container.New(xlayout.NewHPortion([]float64{30, 70}), prLabel, psd.printerSelect)
+	psC := container.New(xlayout.NewHPortion([]float64{30, 70}), psLabel, psd.paperSizeSelect)
+	orC := container.New(xlayout.NewHPortion([]float64{30, 70}), orLabel, psd.orientationRadioGroup)
+	box := container.NewVBox(prC, psC, orC)
+	return box
 }
 
 func (psd *PageSetupDialog) populatePrinterSelect(parent fyne.Window) {
