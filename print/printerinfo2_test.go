@@ -527,37 +527,10 @@ PrinterDevMode:
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// Redirect stdout to a buffer
-			//			old := os.Stdout
-			//			r, w, _ := os.Pipe()
-			//			os.Stdout = w
-
-			// Call the Print method
 			pi2String := tt.pi2.string()
 			if pi2String != tt.expected {
 				t.Errorf("string() output mismatch for %s", tt.name)
 			}
-
-			// Close the write end of the pipe and restore stdout
-			/*			w.Close()
-						//			os.Stdout = old
-
-									// Read the captured output
-									var buf bytes.Buffer
-									if _, err := buf.ReadFrom(r); err != nil {
-										t.Fatalf("Failed to read from buffer: %v", err)
-									}
-									output := buf.String()
-
-									// Trim leading and trailing whitespace from both output and expected
-									output = strings.TrimSpace(output)
-									expected := strings.TrimSpace(tt.expected)
-
-									if output != expected {
-										fmt.Println("Actual:\n", output)
-										fmt.Println("Expected:\n", expected)
-										t.Errorf("string() output mismatch for %s", tt.name)
-									} */
 		})
 	}
 }
