@@ -10,33 +10,59 @@ import (
 	xlayout "fyne.io/x/fyne/layout"
 )
 
+// PageSetupInfo contains information used to initialize the widgets in the PageSetupDialog and
+// to return data from it.
+type PageSetupInfo struct {
+	printer     *Printer
+	paperSize   string
+	orientation string
+}
+
+// NewPageSetupInfo creates a PageSetupInfo object.
+//
+// Params:
+//
+//	printer is a pointer to a Printer object. This is the printer that prints will be sent to.
+//	paperSize is the size of the paper that will be printed. The default paper size is the printer's
+//
+// paper size.
+//
+//	orientation is the paper orientation (portrait or landscape). The default is portrait.
+func NewPageSetupInfo(printer *Printer, paperSize string, orientation string) *PageSetupInfo {
+	return &PageSetupInfo{
+		printer:     printer,
+		paperSize:   paperSize,
+		orientation: orientation,
+	}
+}
+
 // PageSetupDialog is a ConfirmDialog dialog with widgets that must be saved.
 type PageSetupDialog struct {
 	*dialog.ConfirmDialog
+	pageSetupInfo         *PageSetupInfo
 	parent                fyne.Window
 	printerSelect         *widget.Select
 	paperSizeSelect       *widget.Select
 	orientationRadioGroup *widget.RadioGroup
 }
 
-// create a PageSetupDialog.
-var pageSetupDialog *PageSetupDialog = &PageSetupDialog{}
-
-// NewPageSetupDialog creates a PageSetupDialog.
+// NewPageSetupDialog creates a PageSetupDialog which is a ConfirmDialog.
 //
 // Params:
 //
 //	parent is the parent window for the dialog.
-func NewPageSetupDialog(parent fyne.Window) *dialog.ConfirmDialog {
-	pageSetupDialog.parent = parent
-	printerContainer := pageSetupDialog.createPrinterContainer()
-
-	//	box := container.NewVBox(printerContainer)
-
-	pageSetupDialog.ConfirmDialog = dialog.NewCustomConfirm("PageSetup", "OK",
+func NewPageSetupDialog(parent fyne.Window, psInfo *PageSetupInfo) *dialog.ConfirmDialog {
+	psd := &PageSetupDialog{}
+	if psInfo == nil {
+		psInfo = &PageSetupInfo{}
+	}
+	psd.pageSetupInfo = psInfo
+	psd.parent = parent
+	printerContainer := psd.createPrinterContainer()
+	psd.ConfirmDialog = dialog.NewCustomConfirm("PageSetup", "OK",
 		"Cancel", printerContainer, func(bool) {}, parent)
-	pageSetupDialog.Resize(fyne.NewSize(500, 300))
-	return pageSetupDialog.ConfirmDialog
+	psd.Resize(fyne.NewSize(500, 300))
+	return psd.ConfirmDialog
 
 }
 
@@ -71,4 +97,13 @@ func (psd *PageSetupDialog) populatePrinterSelect(parent fyne.Window) {
 	}
 	prNames := printers.getNames()
 	psd.printerSelect.Options = prNames
+
+	if len(prNames) > 0 {
+		if psd.pageSetupInfo.printer != nil {
+			psd.printerSelect.SetSelected(psd.pageSetupInfo.printer.Name())
+		}
+		if len(prNames) == 1 {
+			psd.printerSelect.SetSelected(prNames[0])
+		}
+	}
 }

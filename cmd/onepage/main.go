@@ -17,9 +17,10 @@ import (
 func main() {
 	a := app.New()
 	w := a.NewWindow("One Page Print")
+	printOp := print.NewPrintOperation(w)
 	fileMenu := fyne.NewMenu("File",
 		fyne.NewMenuItem("Page Setup", func() {
-			pSetup := print.NewPageSetupDialog(w)
+			pSetup := printOp.PageSetupDialog()
 			pSetup.Show()
 		}),
 		fyne.NewMenuItem("Quit", func() {
