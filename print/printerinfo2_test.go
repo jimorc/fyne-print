@@ -122,9 +122,9 @@ func TestPrinterInfo2_ShareName(t *testing.T) {
 }
 
 func TestPrinterInfo2_Status(t *testing.T) {
-	pi2 := &PrinterInfo2{status: PRINTER_STATUS_PAUSED | PRINTER_STATUS_ERROR}
-	if pi2.Status() != PRINTER_STATUS_PAUSED|PRINTER_STATUS_ERROR {
-		t.Errorf("Expected attributes %d, but got %d", PRINTER_STATUS_PAUSED|PRINTER_STATUS_ERROR, pi2.Status())
+	pi2 := &PrinterInfo2{status: psPaused | psError}
+	if pi2.Status() != psPaused|psError {
+		t.Errorf("Expected attributes %d, but got %d", psPaused|psError, pi2.Status())
 	}
 }
 
@@ -304,7 +304,7 @@ func TestPrinterInfo2_Print(t *testing.T) {
 				defaultPriority: 1,
 				startTime:       0,
 				untilTime:       0,
-				status:          PRINTER_STATUS_PAUSED | PRINTER_STATUS_ERROR,
+				status:          psPaused | psError,
 				cJobs:           1,
 				averagePPMs:     1,
 			},
@@ -466,7 +466,7 @@ PrinterDevMode:
 				defaultPriority: 1,
 				startTime:       0,
 				untilTime:       0,
-				status:          PRINTER_STATUS_OFFLINE,
+				status:          psOffline,
 				cJobs:           1,
 				averagePPMs:     1,
 			},

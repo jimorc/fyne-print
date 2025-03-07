@@ -59,37 +59,39 @@ const (
 	enterpriseCloud PrinterAttribute = 0x00800000 // PRINTER_ATTRIBUTE_ENTERPRISE_CLOUD
 )
 
+type PrinterStatus uint32
+
 // Printer status values.
 // See https://learn.microsoft.com/en-us/windows/win32/printdocs/printer-info-2
 // for the meaning of each value.
 const (
-	PRINTER_STATUS_PAUSED               = 0x00000001
-	PRINTER_STATUS_ERROR                = 0x00000002
-	PRINTER_STATUS_PENDING_DELETION     = 0x00000004
-	PRINTER_STATUS_PAPER_JAM            = 0x00000008
-	PRINTER_STATUS_PAPER_OUT            = 0x00000010
-	PRINTER_STATUS_MANUAL_FEED          = 0x00000020
-	PRINTER_STATUS_PAPER_PROBLEM        = 0x00000040
-	PRINTER_STATUS_OFFLINE              = 0x00000080
-	PRINTER_STATUS_IO_ACTIVE            = 0x00000100
-	PRINTER_STATUS_BUSY                 = 0x00000200
-	PRINTER_STATUS_PRINTING             = 0x00000400
-	PRINTER_STATUS_OUTPUT_BIN_FULL      = 0x00000800
-	PRINTER_STATUS_NOT_AVAILABLE        = 0x00001000
-	PRINTER_STATUS_WAITING              = 0x00002000
-	PRINTER_STATUS_PROCESSING           = 0x00004000
-	PRINTER_STATUS_INITIALIZING         = 0x00008000
-	PRINTER_STATUS_WARMING_UP           = 0x00010000
-	PRINTER_STATUS_TONER_LOW            = 0x00020000
-	PRINTER_STATUS_NO_TONER             = 0x00040000
-	PRINTER_STATUS_PAGE_PUNT            = 0x00080000
-	PRINTER_STATUS_USER_INTERVENTION    = 0x00100000
-	PRINTER_STATUS_OUT_OF_MEMORY        = 0x00200000
-	PRINTER_STATUS_DOOR_OPEN            = 0x00400000
-	PRINTER_STATUS_SERVER_UNKNOWN       = 0x00800000
-	PRINTER_STATUS_POWER_SAVE           = 0x01000000
-	PRINTER_STATUS_SERVER_OFFLINE       = 0x02000000
-	PRINTER_STATUS_DRIVER_UPDATE_NEEDED = 0x04000000
+	psPaused             PrinterStatus = 0x00000001 // PRINTER_STATUS_PAUSED
+	psError              PrinterStatus = 0x00000002 // PRINTER_STATUS_ERROR
+	psPendingDeletion    PrinterStatus = 0x00000004 // PRINTER_STATUS_PENDING_DELETION
+	psPaperJam           PrinterStatus = 0x00000008 // PRINTER_STATUS_PAPER_JAM
+	psPaperOut           PrinterStatus = 0x00000010 // PRINTER_STATUS_PAPER_OUT
+	psManualFeed         PrinterStatus = 0x00000020 // PRINTER_STATUS_MANUAL_FEED
+	psPaperProblem       PrinterStatus = 0x00000040 // PRINTER_STATUS_PAPER_PROBLEM
+	psOffline            PrinterStatus = 0x00000080 // PRINTER_STATUS_OFFLINE
+	psIOActive           PrinterStatus = 0x00000100 // PRINTER_STATUS_IO_ACTIVE
+	psBusy               PrinterStatus = 0x00000200 // PRINTER_STATUS_BUSY
+	psPrinting           PrinterStatus = 0x00000400 // PRINTER_STATUS_PRINTING
+	psOyutputBinFull     PrinterStatus = 0x00000800 // PRINTER_STATUS_OUTPUT_BIN_FULL
+	psNotAvailable       PrinterStatus = 0x00001000 // PRINTER_STATUS_NOT_AVAILABLE
+	psWaiting            PrinterStatus = 0x00002000 // PRINTER_STATUS_WAITING
+	psProcessing         PrinterStatus = 0x00004000 // PRINTER_STATUS_PROCESSING
+	psInitializing       PrinterStatus = 0x00008000 // PRINTER_STATUS_INITIALIZING
+	psWarmingUp          PrinterStatus = 0x00010000 // PRINTER_STATUS_WARMING_UP
+	psTonerLow           PrinterStatus = 0x00020000 // PRINTER_STATUS_TONER_LOW
+	psNoToner            PrinterStatus = 0x00040000 // PRINTER_STATUS_NO_TONER
+	psPagePunt           PrinterStatus = 0x00080000 // PRINTER_STATUS_PAGE_PUNT
+	psUserIntervention   PrinterStatus = 0x00100000 // PRINTER_STATUS_USER_INTERVENTION
+	psOutOfMemory        PrinterStatus = 0x00200000 // PRINTER_STATUS_OUT_OF_MEMORY
+	psDoorOpen           PrinterStatus = 0x00400000 // PRINTER_STATUS_DOOR_OPEN
+	psServerUnknown      PrinterStatus = 0x00800000 // PRINTER_STATUS_SERVER_UNKNOWN
+	psPowerSave          PrinterStatus = 0x01000000 // PRINTER_STATUS_POWER_SAVE
+	psServerOffline      PrinterStatus = 0x02000000 // PRINTER_STATUS_SERVER_OFFLINE
+	psDriverUpdateNeeded PrinterStatus = 0x04000000 // PRINTER_STATUS_DRIVER_UPDATE_NEEDED
 )
 
 // PrinterInfo2 struct specifies detailed printer information.
@@ -114,7 +116,7 @@ type PrinterInfo2 struct {
 	defaultPriority uint32
 	startTime       uint32
 	untilTime       uint32
-	status          uint32
+	status          PrinterStatus
 	cJobs           uint32
 	averagePPMs     uint32
 }
@@ -179,7 +181,7 @@ func (pi2 *PrinterInfo2) ServerName() string {
 	}
 }
 
-func (pi2 *PrinterInfo2) Status() uint32 {
+func (pi2 *PrinterInfo2) Status() PrinterStatus {
 	return pi2.status
 }
 
@@ -293,87 +295,87 @@ func parsePrinterAttributes(attrs PrinterAttribute) string {
 	return pAttrs.String()
 }
 
-func parsePrinterStatus(status uint32) string {
+func parsePrinterStatus(status PrinterStatus) string {
 	var pStatus strings.Builder
-	if status&PRINTER_STATUS_PAUSED != 0 {
+	if status&psPaused != 0 {
 		pStatus.WriteString("    PRINTER_STATUS_PAUSED ")
 	}
-	if status&PRINTER_STATUS_ERROR != 0 {
+	if status&psError != 0 {
 		pStatus.WriteString("    PRINTER_STATUS_ERROR ")
 	}
-	if status&PRINTER_STATUS_PENDING_DELETION != 0 {
+	if status&psPendingDeletion != 0 {
 		pStatus.WriteString("    PRINTER_STATUS_PENDING_DELETION ")
 	}
-	if status&PRINTER_STATUS_PAPER_JAM != 0 {
+	if status&psPaperJam != 0 {
 		pStatus.WriteString("    PRINTER_STATUS_PAPER_JAM ")
 	}
-	if status&PRINTER_STATUS_PAPER_OUT != 0 {
+	if status&psPaperOut != 0 {
 		pStatus.WriteString("    PRINTER_STATUS_PAPER_OUT ")
 	}
-	if status&PRINTER_STATUS_MANUAL_FEED != 0 {
+	if status&psManualFeed != 0 {
 		pStatus.WriteString("    PRINTER_STATUS_MANUAL_FEED ")
 	}
-	if status&PRINTER_STATUS_PAPER_PROBLEM != 0 {
+	if status&psPaperProblem != 0 {
 		pStatus.WriteString("    PRINTER_STATUS_PAPER_PROBLEM ")
 	}
-	if status&PRINTER_STATUS_OFFLINE != 0 {
+	if status&psOffline != 0 {
 		pStatus.WriteString("    PRINTER_STATUS_OFFLINE ")
 	}
-	if status&PRINTER_STATUS_IO_ACTIVE != 0 {
+	if status&psIOActive != 0 {
 		pStatus.WriteString("    PRINTER_STATUS_IO_ACTIVE ")
 	}
-	if status&PRINTER_STATUS_BUSY != 0 {
+	if status&psBusy != 0 {
 		pStatus.WriteString("    PRINTER_STATUS_BUSY ")
 	}
-	if status&PRINTER_STATUS_PRINTING != 0 {
+	if status&psPrinting != 0 {
 		pStatus.WriteString("    PRINTER_STATUS_PRINTING ")
 	}
-	if status&PRINTER_STATUS_OUTPUT_BIN_FULL != 0 {
+	if status&psOyutputBinFull != 0 {
 		pStatus.WriteString("    PRINTER_STATUS_OUTPUT_BIN_FULL ")
 	}
-	if status&PRINTER_STATUS_NOT_AVAILABLE != 0 {
+	if status&psNotAvailable != 0 {
 		pStatus.WriteString("    PRINTER_STATUS_NOT_AVAILABLE ")
 	}
-	if status&PRINTER_STATUS_WAITING != 0 {
+	if status&psWaiting != 0 {
 		pStatus.WriteString("    PRINTER_STATUS_WAITING ")
 	}
-	if status&PRINTER_STATUS_PROCESSING != 0 {
+	if status&psProcessing != 0 {
 		pStatus.WriteString("    PRINTER_STATUS_PROCESSING ")
 	}
-	if status&PRINTER_STATUS_INITIALIZING != 0 {
+	if status&psInitializing != 0 {
 		pStatus.WriteString("    PRINTER_STATUS_INITIALIZING ")
 	}
-	if status&PRINTER_STATUS_WARMING_UP != 0 {
+	if status&psWarmingUp != 0 {
 		pStatus.WriteString("    PRINTER_STATUS_WARMING_UP ")
 	}
-	if status&PRINTER_STATUS_TONER_LOW != 0 {
+	if status&psTonerLow != 0 {
 		pStatus.WriteString("    PRINTER_STATUS_TONER_LOW ")
 	}
-	if status&PRINTER_STATUS_NO_TONER != 0 {
+	if status&psNoToner != 0 {
 		pStatus.WriteString("    PRINTER_STATUS_NO_TONER ")
 	}
-	if status&PRINTER_STATUS_PAGE_PUNT != 0 {
+	if status&psPagePunt != 0 {
 		pStatus.WriteString("    PRINTER_STATUS_PAGE_PUNT ")
 	}
-	if status&PRINTER_STATUS_USER_INTERVENTION != 0 {
+	if status&psUserIntervention != 0 {
 		pStatus.WriteString("    PRINTER_STATUS_USER_INTERVENTION ")
 	}
-	if status&PRINTER_STATUS_OUT_OF_MEMORY != 0 {
+	if status&psOutOfMemory != 0 {
 		pStatus.WriteString("    PRINTER_STATUS_OUT_OF_MEMORY ")
 	}
-	if status&PRINTER_STATUS_DOOR_OPEN != 0 {
+	if status&psDoorOpen != 0 {
 		pStatus.WriteString("    PRINTER_STATUS_DOOR_OPEN ")
 	}
-	if status&PRINTER_STATUS_SERVER_UNKNOWN != 0 {
+	if status&psServerUnknown != 0 {
 		pStatus.WriteString("    PRINTER_STATUS_SERVER_UNKNOWN ")
 	}
-	if status&PRINTER_STATUS_POWER_SAVE != 0 {
+	if status&psPowerSave != 0 {
 		pStatus.WriteString("    PRINTER_STATUS_POWER_SAVE ")
 	}
-	if status&PRINTER_STATUS_SERVER_OFFLINE != 0 {
+	if status&psServerOffline != 0 {
 		pStatus.WriteString("    PRINTER_STATUS_SERVER_OFFLINE ")
 	}
-	if status&PRINTER_STATUS_DRIVER_UPDATE_NEEDED != 0 {
+	if status&psDriverUpdateNeeded != 0 {
 		pStatus.WriteString("    PRINTER_STATUS_DRIVER_UPDATE_NEEDED ")
 	}
 	return pStatus.String()
