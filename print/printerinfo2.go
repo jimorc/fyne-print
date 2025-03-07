@@ -194,31 +194,31 @@ func (pi2 *PrinterInfo2) ShareName() string {
 	return StringFromUTF16(pi2.shareName)
 }
 
-// Print prints out various values in the PrinterInfo2 struct.
-func (pi2 *PrinterInfo2) Print() {
-	fmt.Println("PrinterInfo2")
-	fmt.Printf("    Server Name: %s\n", pi2.ServerName())
-	fmt.Printf("    Printer Name: %s\n", pi2.Name())
-	fmt.Printf("    Share Name: %s\n", pi2.ShareName())
-	fmt.Printf("    Port Name: %s\n", pi2.PortName())
-	fmt.Printf("    Driver Name: %s\n", pi2.DriverName())
-	fmt.Printf("    Comment: %s\n", pi2.Comment())
-	fmt.Printf("    Location: %s\n", pi2.Location())
-	pi2.DevMode.Print()
-	fmt.Printf("    Sep File: %s\n", pi2.SeparatorFile())
-	fmt.Printf("    Print Processor: %s\n", pi2.PrintProcessor())
-	fmt.Printf("    Data Type: %s\n", pi2.DataType())
-	fmt.Printf("    Parameters: %s\n", pi2.Parameters())
-	fmt.Println("    Attributes:")
-	fmt.Println(parsePrinterAttributes(pi2.Attributes()))
-	fmt.Printf("    Priority: %d\n", pi2.priority)
-	fmt.Printf("    Default Priority: %d\n", pi2.defaultPriority)
-	fmt.Printf("    Start Time: %d\n", pi2.startTime)
-	fmt.Printf("    Until Time: %d\n", pi2.untilTime)
-	fmt.Println("    Status:")
-	fmt.Println(parsePrinterStatus(pi2.Status()))
-	fmt.Printf("    Jobs: %d\n", pi2.cJobs)
-	fmt.Printf("    Average PPMs: %d\n", pi2.averagePPMs)
+// string returns the PrinterInfo2 struct as a string.
+func (pi2 *PrinterInfo2) string() string {
+	var s strings.Builder
+	s.WriteString(fmt.Sprintln("PrinterInfo2"))
+	s.WriteString(fmt.Sprintf("    Server Name: %s\n", pi2.ServerName()))
+	s.WriteString(fmt.Sprintf("    Printer Name: %s\n", pi2.Name()))
+	s.WriteString(fmt.Sprintf("    Share Name: %s\n", pi2.ShareName()))
+	s.WriteString(fmt.Sprintf("    Port Name: %s\n", pi2.PortName()))
+	s.WriteString(fmt.Sprintf("    Driver Name: %s\n", pi2.DriverName()))
+	s.WriteString(fmt.Sprintf("    Comment: %s\n", pi2.Comment()))
+	s.WriteString(fmt.Sprintf("    Location: %s\n", pi2.Location()))
+	s.WriteString(pi2.DevMode.string())
+	s.WriteString(fmt.Sprintf("    Sep File: %s\n", pi2.SeparatorFile()))
+	s.WriteString(fmt.Sprintf("    Print Processor: %s\n", pi2.PrintProcessor()))
+	s.WriteString(fmt.Sprintf("    Data Type: %s\n", pi2.DataType()))
+	s.WriteString(fmt.Sprintf("    Parameters: %s\n", pi2.Parameters()))
+	s.WriteString(fmt.Sprintf("    Attributes:\n%s\n", parsePrinterAttributes(pi2.Attributes())))
+	s.WriteString(fmt.Sprintf("    Priority: %d\n", pi2.priority))
+	s.WriteString(fmt.Sprintf("    Default Priority: %d\n", pi2.defaultPriority))
+	s.WriteString(fmt.Sprintf("    Start Time: %d\n", pi2.startTime))
+	s.WriteString(fmt.Sprintf("    Until Time: %d\n", pi2.untilTime))
+	s.WriteString(fmt.Sprintf("    Status:\n%s\n", parsePrinterStatus(pi2.Status())))
+	s.WriteString(fmt.Sprintf("    Jobs: %d\n", pi2.cJobs))
+	s.WriteString(fmt.Sprintf("    Average PPMs: %d\n", pi2.averagePPMs))
+	return s.String()
 }
 
 func parsePrinterAttributes(attrs PrinterAttribute) string {

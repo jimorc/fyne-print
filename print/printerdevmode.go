@@ -4,6 +4,7 @@ package print
 
 import (
 	"fmt"
+	"strings"
 	"syscall"
 )
 
@@ -63,41 +64,44 @@ func (m *PrinterDevMode) FormName() string {
 	return syscall.UTF16ToString(m.dmFormName[:])
 }
 
-// Print prints out the values of the PrinterDevMode struct.
-func (m *PrinterDevMode) Print() {
-	fmt.Println("PrinterDevMode:")
-	fmt.Printf("    Device Name: %s\n", m.DeviceName())
-	fmt.Printf("    SpecVersion: %d\n", m.dmSpecVersion)
-	fmt.Printf("    Driver Version: %d\n", m.dmDriverVersion)
-	fmt.Printf("    Size: %d\n", m.dmSize)
-	fmt.Printf("    Driver Extra: %d\n", m.dmDriverExtra)
-	fmt.Printf("    Fields: %d\n", m.dmFields)
-	fmt.Printf("    Orientation: %d\n", m.dmOrientation)
-	fmt.Printf("    PaperSize: %d\n", m.dmPaperSize)
-	fmt.Printf("    Paper Length: %d\n", m.dmPaperLength)
-	fmt.Printf("    Paper Width: %d\n", m.dmPaperWidth)
-	fmt.Printf("    Scale: %d\n", m.dmScale)
-	fmt.Printf("    Copies: %d\n", m.dmCopies)
-	fmt.Printf("    Default Source: %d\n", m.dmDefaultSource)
-	fmt.Printf("    Print Quality: %d\n", m.dmPrintQuality)
-	fmt.Printf("    Color: %d\n", m.dmColor)
-	fmt.Printf("    Duplex: %d\n", m.dmDuplex)
-	fmt.Printf("    Y-Resolution: %d\n", m.dmYResolution)
-	fmt.Printf("    TT Option: %d\n", m.dmTTOption)
-	fmt.Printf("    Collate: %d\n", m.dmCollate)
-	fmt.Printf("    Form Name: %s\n", m.FormName())
-	fmt.Printf("    Logical Pixels: %d\n", m.dmLogPixels)
-	fmt.Printf("    Bits Per Pel: %d\n", m.dmBitsPerPel)
-	fmt.Printf("    Pels Width: %d\n", m.dmPelsWidth)
-	fmt.Printf("    Pels Height: %d\n", m.dmPelsHeight)
-	fmt.Printf("    Where NUP is done: %d\n", m.dmNup)
-	fmt.Printf("    Display Frequency: %d\n", m.dmDisplayFrequency)
-	fmt.Printf("    ICM Method: %d\n", m.dmICMMethod)
-	fmt.Printf("    ICM Intent: %d\n", m.dmICMIntent)
-	fmt.Printf("    Media Type: %d\n", m.dmMediaType)
-	fmt.Printf("    Dither Type: %d\n", m.dmDitherType)
-	fmt.Printf("    Panning Width: %d\n", m.dmPanningWidth)
-	fmt.Printf("    Panning Height: %d\n", m.dmPanningHeight)
+// string returns the PrinterDevMode struct as a string.
+func (m *PrinterDevMode) string() string {
+	var s strings.Builder
+	s.WriteString("PrinterDevMode:\n")
+	s.WriteString(fmt.Sprintf("    Device Name: %s\n", m.DeviceName()))
+	s.WriteString(fmt.Sprintf("    SpecVersion: %d\n", m.dmSpecVersion))
+	s.WriteString(fmt.Sprintf("    Driver Version: %d\n", m.dmDriverVersion))
+	s.WriteString(fmt.Sprintf("    Size: %d\n", m.dmSize))
+	s.WriteString(fmt.Sprintf("    Driver Extra: %d\n", m.dmDriverExtra))
+	s.WriteString(fmt.Sprintf("    Fields: %d\n", m.dmFields))
+	s.WriteString(fmt.Sprintf("    Orientation: %d\n", m.dmOrientation))
+	s.WriteString(fmt.Sprintf("    PaperSize: %d\n", m.dmPaperSize))
+	s.WriteString(fmt.Sprintf("    Paper Length: %d\n", m.dmPaperLength))
+	s.WriteString(fmt.Sprintf("    Paper Width: %d\n", m.dmPaperWidth))
+	s.WriteString(fmt.Sprintf("    Scale: %d\n", m.dmScale))
+	s.WriteString(fmt.Sprintf("    Copies: %d\n", m.dmCopies))
+	s.WriteString(fmt.Sprintf("    Default Source: %d\n", m.dmDefaultSource))
+	s.WriteString(fmt.Sprintf("    Print Quality: %d\n", m.dmPrintQuality))
+	s.WriteString(fmt.Sprintf("    Color: %d\n", m.dmColor))
+	s.WriteString(fmt.Sprintf("    Duplex: %d\n", m.dmDuplex))
+	s.WriteString(fmt.Sprintf("    Y-Resolution: %d\n", m.dmYResolution))
+	s.WriteString(fmt.Sprintf("    TT Option: %d\n", m.dmTTOption))
+	s.WriteString(fmt.Sprintf("    Collate: %d\n", m.dmCollate))
+	s.WriteString(fmt.Sprintf("    Form Name: %s\n", m.FormName()))
+	s.WriteString(fmt.Sprintf("    Logical Pixels: %d\n", m.dmLogPixels))
+	s.WriteString(fmt.Sprintf("    Bits Per Pel: %d\n", m.dmBitsPerPel))
+	s.WriteString(fmt.Sprintf("    Pels Width: %d\n", m.dmPelsWidth))
+	s.WriteString(fmt.Sprintf("    Pels Height: %d\n", m.dmPelsHeight))
+	s.WriteString(fmt.Sprintf("    Where NUP is done: %d\n", m.dmNup))
+	s.WriteString(fmt.Sprintf("    Display Frequency: %d\n", m.dmDisplayFrequency))
+	s.WriteString(fmt.Sprintf("    ICM Method: %d\n", m.dmICMMethod))
+	s.WriteString(fmt.Sprintf("    ICM Intent: %d\n", m.dmICMIntent))
+	s.WriteString(fmt.Sprintf("    Media Type: %d\n", m.dmMediaType))
+	s.WriteString(fmt.Sprintf("    Dither Type: %d\n", m.dmDitherType))
+	s.WriteString(fmt.Sprintf("    Panning Width: %d\n", m.dmPanningWidth))
+	s.WriteString(fmt.Sprintf("    Panning Height: %d\n", m.dmPanningHeight))
+
+	return s.String()
 }
 
 // Copy performs a deep copy of the PrinterDevMode struct.
