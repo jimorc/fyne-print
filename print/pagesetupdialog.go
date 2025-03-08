@@ -41,7 +41,9 @@ type PageSetupDialog struct {
 	*dialog.ConfirmDialog
 	pageSetupInfo         *PageSetupInfo
 	parent                fyne.Window
+	printers              *Printers
 	printerSelect         *widget.Select
+	location              *widget.Label
 	paperSizeSelect       *widget.Select
 	orientationRadioGroup *widget.RadioGroup
 }
@@ -69,8 +71,10 @@ func NewPageSetupDialog(parent fyne.Window, psInfo *PageSetupInfo) *dialog.Confi
 // createPrinterContainer creates the container that holds the printers select and label.
 func (psd *PageSetupDialog) createPrinterContainer() *fyne.Container {
 	prLabel := widget.NewLabel("Format For")
-	psd.printerSelect = widget.NewSelect([]string{}, nil)
+	psd.printerSelect = widget.NewSelect([]string{}, psd.printerSelected)
 	psd.printerSelect.Alignment = fyne.TextAlignTrailing
+	locLabel := widget.NewLabel("Location")
+	psd.location = widget.NewLabel("")
 	psLabel := widget.NewLabel("Paper Size")
 	psd.paperSizeSelect = widget.NewSelect([]string{}, nil)
 	psd.paperSizeSelect.Alignment = fyne.TextAlignTrailing
@@ -79,14 +83,15 @@ func (psd *PageSetupDialog) createPrinterContainer() *fyne.Container {
 	psd.orientationRadioGroup.Horizontal = true
 	psd.populatePrinterSelect(psd.parent)
 	prC := container.New(xlayout.NewHPortion([]float64{30, 70}), prLabel, psd.printerSelect)
+	prLocC := container.New(xlayout.NewHPortion([]float64{30, 70}), locLabel, psd.location)
 	psC := container.New(xlayout.NewHPortion([]float64{30, 70}), psLabel, psd.paperSizeSelect)
 	orC := container.New(xlayout.NewHPortion([]float64{30, 70}), orLabel, psd.orientationRadioGroup)
-	box := container.NewVBox(prC, psC, orC)
+	box := container.NewVBox(prC, prLocC, psC, orC)
 	return box
 }
 
 func (psd *PageSetupDialog) populatePrinterSelect(parent fyne.Window) {
-	printers, err := NewPrinters()
+	ps, err := NewPrinters()
 	if err != nil {
 		fyne.LogError("Error retrieving printers", err)
 		err1 := errors.New("Error retrieving list of printers:\n" +
@@ -95,7 +100,8 @@ func (psd *PageSetupDialog) populatePrinterSelect(parent fyne.Window) {
 		dialog.ShowError(err1, parent)
 		return
 	}
-	prNames := printers.getNames()
+	psd.printers = ps
+	prNames := psd.printers.getNames()
 	psd.printerSelect.Options = prNames
 
 	// set selected
@@ -105,10 +111,23 @@ func (psd *PageSetupDialog) populatePrinterSelect(parent fyne.Window) {
 		} else if len(prNames) == 1 {
 			psd.printerSelect.SetSelected(prNames[0])
 		} else {
-			defPr := printers.DefaultPrinter()
+			defPr := psd.printers.DefaultPrinter()
 			if defPr != nil {
 				psd.printerSelect.SetSelected(defPr.Name())
 			}
 		}
 	}
+}
+
+func (psd *PageSetupDialog) printerSelected(name string) {
+	if psd.printers == nil {
+		return
+	}
+	pr := psd.printers.getPrinterByName(name)
+	loc := ""
+	if pr != nil && pr.Name() == name {
+		loc = pr.Location()
+	}
+	psd.location.Text = loc
+	psd.location.Refresh()
 }
