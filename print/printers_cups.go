@@ -3,8 +3,6 @@
 package print
 
 import (
-	"fmt"
-
 	"fyne.io/fyne/v2"
 	"github.com/OpenPrinting/goipp"
 )
@@ -14,24 +12,22 @@ type Printers struct {
 	Printers []Printer
 }
 
-// getDefaultPrinterIndex returns the index of the default printer
-// in the Printers object, or -1 if there is no default printer.
-func (p *Printers) GetDefaultPrinter() int {
-	index := -1
+// DefaultPrinter returns the name of default printer
+// in the Printers object, or nil if no default printer.
+func (p *Printers) DefaultPrinter() *Printer {
 	groups, err := getResponseGroups(goipp.OpCupsGetDefault,
 		localCupsURI, "printer-name")
 	if err != nil {
 		fyne.LogError("Error getting default CUPS printer", err)
-		return index
+		return nil
 	}
 	for _, group := range *groups {
 		if group.Tag == goipp.TagPrinterGroup {
 			pr := newPrinter(group)
-			index, _ = p.getPrinterIndexByName(pr.Name())
-			return index
+			return p.getPrinterByName(pr.Name())
 		}
 	}
-	return index
+	return nil
 }
 
 // getNames retrieves the list of all printer names.
@@ -43,7 +39,7 @@ func (p *Printers) getNames() []string {
 	return names
 }
 
-// getPrinterIndexByName returns the index of the printer within the printers
+// getPrinterByName returns the the printer within the printers
 // object that has the specified name.
 //
 // Params:
@@ -52,15 +48,14 @@ func (p *Printers) getNames() []string {
 //
 // Returns:
 //
-//	index of the matching printer within the Printers object, or -1 on error.
-//	error if matching printer is not found, or nil if found.
-func (p *Printers) getPrinterIndexByName(name string) (int, error) {
+//	The matching printer within the Printers object, or nil if not found.
+func (p *Printers) getPrinterByName(name string) *Printer {
 	for i, pr := range p.Printers {
 		if pr.Name() == name {
-			return i, nil
+			return &p.Printers[i]
 		}
 	}
-	return -1, fmt.Errorf("Printer with name: \"%s\" not found", name)
+	return nil
 }
 
 // addPrinter adds a Printer object to the Printers object.
