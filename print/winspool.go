@@ -22,7 +22,8 @@ const (
 var (
 	modwinspool = syscall.NewLazyDLL("winspool.drv")
 
-	procEnumPrinters = modwinspool.NewProc("EnumPrintersW")
+	procEnumPrinters      = modwinspool.NewProc("EnumPrintersW")
+	procGetDefaultPrinter = modwinspool.NewProc("GetDefaultPrinterW")
 )
 
 // EnumPrinters enumerates available printers, print servers, domains, or print providers.
@@ -49,4 +50,12 @@ func EnumPrinters(flags uint32,
 		uintptr(unsafe.Pointer(needed)),
 		uintptr(unsafe.Pointer(cReturned)))
 	return r1 != 0, err
+}
+
+// getDefaultPrinter returns default printer information.
+func getDefaultPrinter(buf *uint16, bufN *uint32) error {
+	_, _, err := procGetDefaultPrinter.Call(
+		uintptr(unsafe.Pointer(buf)),
+		uintptr(unsafe.Pointer(bufN)))
+	return err
 }

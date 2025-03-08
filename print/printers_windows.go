@@ -3,8 +3,11 @@
 package print
 
 import (
+	"fmt"
 	"syscall"
 	"unsafe"
+
+	"fyne.io/fyne/v2"
 )
 
 // Printers contains a slice of Printer structs. This typically contains a slice of all
@@ -52,7 +55,7 @@ func NewPrinters() (*Printers, error) {
 	pInfo2 := (*[1024]PrinterInfo2)(unsafe.Pointer(&buffer[0]))[:info2Count:info2Count]
 	printers := &Printers{}
 	for _, info2 := range pInfo2 {
-		//		info2.Print()
+		fmt.Println(info2.string())
 		p := NewPrinter(&info2)
 		printers.Add(p)
 	}
@@ -62,6 +65,29 @@ func NewPrinters() (*Printers, error) {
 // Add adds a printer to the Printers struct.
 func (p *Printers) Add(printer *Printer) {
 	p.Printers = append(p.Printers, *printer)
+}
+
+// DefaultPrinter returns the system's default Printer, or nil on error or no default.
+func (p *Printers) DefaultPrinter() *Printer {
+	buf := make([]uint16, 3)
+	bufN := uint32(len(buf))
+	err := getDefaultPrinter(&buf[0], &bufN)
+	if err != syscall.ERROR_INSUFFICIENT_BUFFER {
+		fyne.LogError("Error getting default printer", err)
+		return nil
+	}
+	buf = make([]uint16, bufN)
+	err = getDefaultPrinter(&buf[0], &bufN)
+	if err != syscall.Errno(0) {
+		fyne.LogError("Error getting default printer", err)
+		return nil
+	}
+	for _, printer := range p.Printers {
+		if printer.Name() == StringFromUTF16(&buf[0]) {
+			return &printer
+		}
+	}
+	return nil
 }
 
 // getNames retrieves the names of all printers in the Printers struct.
