@@ -17,3 +17,7 @@ func NewPrinter(pInfo2 *PrinterInfo2) *Printer {
 func (p *Printer) Name() string {
 	return p.printerInfo2.Name()
 }
+
+func (p *Printer) Location() string {
+	return p.printerInfo2.Location()
+}

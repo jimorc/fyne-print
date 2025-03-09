@@ -67,6 +67,15 @@ func (p *Printers) Add(printer *Printer) {
 	p.Printers = append(p.Printers, *printer)
 }
 
+func (p *Printers) getPrinterByName(name string) *Printer {
+	for _, printer := range p.Printers {
+		if printer.Name() == name {
+			return &printer
+		}
+	}
+	return nil
+}
+
 // DefaultPrinter returns the system's default Printer, or nil on error or no default.
 func (p *Printers) DefaultPrinter() *Printer {
 	buf := make([]uint16, 3)
