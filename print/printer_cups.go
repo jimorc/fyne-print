@@ -9,6 +9,7 @@ import "github.com/OpenPrinting/goipp"
 type Printer struct {
 	name     string
 	location string
+	comment  string
 }
 
 // newPrinter creates a Printer object based on CUPS ipp group info.
@@ -21,16 +22,23 @@ func newPrinter(ippGroup goipp.Group) *Printer {
 		if attr.Name == "printer-location" {
 			pr.location = attr.Values.String()
 		}
+		if attr.Name == "printer-info" {
+			pr.comment = attr.Values.String()
+		}
 	}
 	return pr
 }
 
-// Name retrieves the printer's name as returned by CUPS.
-func (pr *Printer) Name() string {
-	return pr.name
+func (pr *Printer) Comment() string {
+	return pr.comment
 }
 
 // Location retrieves the printer's location as returned by CUPS.
 func (pr *Printer) Location() string {
 	return pr.location
+}
+
+// Name retrieves the printer's name as returned by CUPS.
+func (pr *Printer) Name() string {
+	return pr.name
 }
