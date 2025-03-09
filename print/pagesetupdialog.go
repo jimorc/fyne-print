@@ -44,6 +44,7 @@ type PageSetupDialog struct {
 	printers              *Printers
 	printerSelect         *widget.Select
 	location              *widget.Label
+	comment               *widget.Label
 	paperSizeSelect       *widget.Select
 	orientationRadioGroup *widget.RadioGroup
 }
@@ -75,6 +76,8 @@ func (psd *PageSetupDialog) createPrinterContainer() *fyne.Container {
 	psd.printerSelect.Alignment = fyne.TextAlignTrailing
 	locLabel := widget.NewLabel("Location")
 	psd.location = widget.NewLabel("")
+	commentLabel := widget.NewLabel("Comment")
+	psd.comment = widget.NewLabel("")
 	psLabel := widget.NewLabel("Paper Size")
 	psd.paperSizeSelect = widget.NewSelect([]string{}, nil)
 	psd.paperSizeSelect.Alignment = fyne.TextAlignTrailing
@@ -84,9 +87,10 @@ func (psd *PageSetupDialog) createPrinterContainer() *fyne.Container {
 	psd.populatePrinterSelect(psd.parent)
 	prC := container.New(xlayout.NewHPortion([]float64{30, 70}), prLabel, psd.printerSelect)
 	prLocC := container.New(xlayout.NewHPortion([]float64{30, 70}), locLabel, psd.location)
+	prCommentC := container.New(xlayout.NewHPortion([]float64{30, 70}), commentLabel, psd.comment)
 	psC := container.New(xlayout.NewHPortion([]float64{30, 70}), psLabel, psd.paperSizeSelect)
 	orC := container.New(xlayout.NewHPortion([]float64{30, 70}), orLabel, psd.orientationRadioGroup)
-	box := container.NewVBox(prC, prLocC, psC, orC)
+	box := container.NewVBox(prC, prLocC, prCommentC, psC, orC)
 	return box
 }
 
@@ -130,4 +134,10 @@ func (psd *PageSetupDialog) printerSelected(name string) {
 	}
 	psd.location.Text = loc
 	psd.location.Refresh()
+	comment := ""
+	if pr != nil && pr.Name() == name {
+		comment = pr.Comment()
+	}
+	psd.comment.Text = comment
+	psd.comment.Refresh()
 }

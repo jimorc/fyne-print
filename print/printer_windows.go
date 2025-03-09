@@ -11,11 +11,17 @@ func NewPrinter(pInfo2 *PrinterInfo2) *Printer {
 	return p
 }
 
+// Comment returns the comment set in the printer properties.
+func (p *Printer) Comment() string {
+	return p.printerInfo2.Comment()
+}
+
 //Name returns the name of the printer.
 func (p *Printer) Name() string {
 	return p.printerInfo2.Name()
 }
 
+// Location returns the location set in the printer properties.
 func (p *Printer) Location() string {
 	return p.printerInfo2.Location()
 }
