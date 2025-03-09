@@ -1,5 +1,3 @@
-//go:build windows
-
 package print
 
 // Printer is a struct containing information related to the printer.
