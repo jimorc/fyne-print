@@ -22,12 +22,41 @@ const (
 var (
 	modwinspool = syscall.NewLazyDLL("winspool.drv")
 
-	procEnumPrinters      = modwinspool.NewProc("EnumPrintersW")
-	procGetDefaultPrinter = modwinspool.NewProc("GetDefaultPrinterW")
+	procDeviceCapabilities = modwinspool.NewProc("DeviceCapabilitiesW")
+	procEnumPrinters       = modwinspool.NewProc("EnumPrintersW")
+	procGetDefaultPrinter  = modwinspool.NewProc("GetDefaultPrinterW")
 )
 
+// devicvCapabilities retrieves the capabilities of a printer driver.
+// See https://learn.microsoft.com/en-us/windows/win32/printdocs/documentproperties
+// for information on the arguments.
+//
+// The return value depends on the the capability being requested.
+// A return value of zero generally indicates that, while the function completed successfully,
+// there was some type of failure, such as a capability that is not supported. For more details,
+// see the descriptions for the fwCapability values.
+//
+// If the function returns -1, this may mean either that the capability is not supported or
+// there was a general function failure.
+func deviceCapabilities(name string,
+	port string,
+	capability devCapIndex,
+	output uintptr,
+	devMode *PrinterDevMode) (int32, error) {
+	n, _ := syscall.UTF16FromString(name)
+	p, _ := syscall.UTF16FromString(port)
+	r1, _, err := procDeviceCapabilities.Call(
+		uintptr(unsafe.Pointer(&n[0])),
+		uintptr(unsafe.Pointer(&p[0])),
+		uintptr(capability),
+		output,
+		uintptr(unsafe.Pointer(devMode)))
+	return int32(r1), err
+}
+
 // EnumPrinters enumerates available printers, print servers, domains, or print providers.
-// See https://learn.microsoft.com/en-us/windows/win32/printdocs/enumprinters for information on the arguments.
+// See https://learn.microsoft.com/en-us/windows/win32/printdocs/enumprinters for information
+// on the arguments.
 //
 // Returns:
 //
