@@ -45,3 +45,13 @@ func newPaperSize(psName string, name string, width float32, height float32) Pap
 	ps.name = lang.L(name)
 	return ps
 }
+
+// SizeInMM returns the size of the paper in mm.
+func (ps PaperSize) SizeInMM() fyne.Size {
+	return fyne.NewSize(ps.width/100, ps.height/100)
+}
+
+// SizeInInches returns the size of the paper in inches.
+func (ps PaperSize) SizeInInches() fyne.Size {
+	return fyne.NewSize(ps.width/2540, ps.height/2540)
+}
