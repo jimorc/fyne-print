@@ -1,5 +1,7 @@
 package print
 
+import "fyne.io/fyne/v2"
+
 // paperSizes contains a slice of PaperSize objects.
 type paperSizes struct {
 	sizes []PaperSize
@@ -149,7 +151,7 @@ func init() {
 		newPaperSize("na_f_44x68in", "44x68in", 44*2540, 68*25),
 		newPaperSize("na_fanfold-eur_8.5x12in", "German Std. Fanfold", 8.5*2540, 12*2540),
 		newPaperSize("na_fanfold-us_11x14.875in", "US Fanfold", 11*2540, 14.875*2540),
-		newPaperSize("na_foolscap_8.5x13in", "German Legal Fanfold", 8.5*2540, 11*2540),
+		newPaperSize("na_foolscap_8.5x13in", "German Legal Fanfold", 8.5*2540, 13*2540),
 		newPaperSize("na_govt-legal_8x13in", "NA Govt. Legal", 8*2540, 13*2540),
 		newPaperSize("na_govt-letter_8x10in", "NA Govt. Letter", 8*2540, 10*2540),
 		newPaperSize("na_index-3x5_3x5in", "3.5x5in", 3.5*2540, 5*2540),
@@ -231,4 +233,13 @@ func init() {
 		newPaperSize("roc_8k_10.75x15.5in", "ROC 8K", 10.75*2540, 15.5*2540),
 		newPaperSize("roc_16k_7.75x10.75in", "ROC 16K", 7.75*2540, 10.75*2540),
 	}
+}
+
+func (s *paperSizes) findPaperSizeFromSize(size fyne.Size) *PaperSize {
+	for _, sz := range s.sizes {
+		if sz.width() == size.Width && sz.height() == size.Height {
+			return &sz
+		}
+	}
+	return nil
 }

@@ -20,10 +20,10 @@ func NewMargin(top, bottom, left, right float32) Margin {
 
 // Papersize defines the size of the paper.
 type PaperSize struct {
-	psName string
-	name   string
-	width  float32
-	height float32
+	psN string
+	n   string
+	w   float32
+	h   float32
 }
 
 // newPaperSize creates a PaperSize struct for the values input.
@@ -41,17 +41,39 @@ type PaperSize struct {
 //	width is the width in 100ths of a mm for the media in portrait mode.
 //	height is the height in 100ths of a mm for the media in portrait mode.
 func newPaperSize(psName string, name string, width float32, height float32) PaperSize {
-	ps := PaperSize{psName: psName, width: width, height: height}
-	ps.name = lang.L(name)
+	ps := PaperSize{psN: psName, w: width, h: height}
+	ps.n = lang.L(name)
 	return ps
+}
+
+// Height retrieves the height in 100ths of a mm of the PaperSize object.
+func (ps PaperSize) height() float32 {
+	return ps.h
+}
+
+// Name retrieves the translated paper size common name.
+func (ps PaperSize) name() string {
+	return ps.n
+}
+
+// PSName retrieves the paper size name. For paper sizes that are IANA registered
+// IPP media sizes, it is that size. For non-registered media sizes, it would either
+// be a name specified by the printer, or a custom name.
+func (ps PaperSize) psName() string {
+	return ps.psN
 }
 
 // SizeInMM returns the size of the paper in mm.
 func (ps PaperSize) SizeInMM() fyne.Size {
-	return fyne.NewSize(ps.width/100, ps.height/100)
+	return fyne.NewSize(ps.w/100, ps.h/100)
 }
 
 // SizeInInches returns the size of the paper in inches.
 func (ps PaperSize) SizeInInches() fyne.Size {
-	return fyne.NewSize(ps.width/2540, ps.height/2540)
+	return fyne.NewSize(ps.w/2540, ps.h/2540)
+}
+
+// getWidthr retrieves the width of the paper in 100ths of a mm
+func (ps PaperSize) width() float32 {
+	return ps.w
 }
