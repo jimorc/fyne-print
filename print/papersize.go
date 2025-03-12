@@ -1,5 +1,10 @@
 package print
 
+import (
+	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/lang"
+)
+
 // Margin is the paper margin. That is, the margins that will not be printed.
 type Margin struct {
 	top    float32
@@ -24,13 +29,19 @@ type PaperSize struct {
 // newPaperSize creates a PaperSize struct for the values input.
 //
 // Params:
+//
 //	psName is the name of the paper size. This would normally be the IPP media size name
+//
 // registered with IANA. If the media size is not registered, it may be some other name.
+//
 //	name is the English name of the media size. It is translated to the system language if the
+//
 // translation exists.
+//
 //	width is the width in 100ths of a mm for the media in portrait mode.
 //	height is the height in 100ths of a mm for the media in portrait mode.
 func newPaperSize(psName string, name string, width float32, height float32) PaperSize {
-	// TODO: translate name string to system language using fyne lang module.
-	return PaperSize{psName: psName, name: name, width: width, height: height}
+	ps := PaperSize{psName: psName, width: width, height: height}
+	ps.name = lang.L(name)
+	return ps
 }
