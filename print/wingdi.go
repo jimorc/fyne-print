@@ -2,6 +2,13 @@
 
 package print
 
+// intPaperSize is the paper size as integer values. When retrieved using deviceCapabilities,
+// the size is in tenths of a millimeter.
+type intPaperSize struct {
+	w int32
+	h int32
+}
+
 const (
 	maxNumPaperSizes = 256 // more than enough for all paper sizes returned from a Windows printer driver
 	paperNameSize    = 64  // maximum size of a paper name.

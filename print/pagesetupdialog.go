@@ -140,5 +140,9 @@ func (psd *PageSetupDialog) printerSelected(name string) {
 	}
 	psd.comment.Text = comment
 	psd.comment.Refresh()
+	err := pr.retrievePaperSizes()
+	if err != nil {
+		dialog.ShowError(err, psd.parent)
+	}
 	psd.paperSizeSelect.Options = pr.paperNames()
 }

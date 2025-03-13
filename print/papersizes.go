@@ -41,14 +41,14 @@ func init() {
 		newPaperSize("iso_a3x7_420x2080mm", "A3x7", 42000, 208000),
 		newPaperSize("iso_a4-extra_235.5x322.3mm", "A4 Extra", 23550, 32230),
 		newPaperSize("iso_a4-tab_225x297mm", "A4 Tab", 22500, 29700),
-		newPaperSize("iso_a4_297x420mm", "A4", 21000, 29700),
-		newPaperSize("iso_a4x3_297x630mm", "A4x3", 21000, 63000),
-		newPaperSize("iso_a4x4_297x794mm", "A4x4", 21000, 79400),
-		newPaperSize("iso_a4x5_297x958mm", "A4x5", 21000, 95800),
-		newPaperSize("iso_a4x6_297x1122mm", "A4x6", 21000, 112200),
-		newPaperSize("iso_a4x7_297x1286mm", "A4x7", 21000, 128600),
-		newPaperSize("iso_a4x8_297x1450mm", "A4x8", 21000, 145000),
-		newPaperSize("iso_a4x9_297x1892mm", "A4x9", 21000, 189200),
+		newPaperSize("iso_a4_210x297mm", "A4", 21000, 29700),
+		newPaperSize("iso_a4x3_297x630mm", "A4x3", 29700, 63000),
+		newPaperSize("iso_a4x4_297x794mm", "A4x4", 29700, 79400),
+		newPaperSize("iso_a4x5_297x958mm", "A4x5", 29700, 95800),
+		newPaperSize("iso_a4x6_297x1122mm", "A4x6", 29700, 112200),
+		newPaperSize("iso_a4x7_297x1286mm", "A4x7", 29700, 128600),
+		newPaperSize("iso_a4x8_297x1450mm", "A4x8", 29700, 145000),
+		newPaperSize("iso_a4x9_297x1892mm", "A4x9", 29700, 189200),
 		newPaperSize("iso_a5-extra_174x235mm", "A5 Extra", 17400, 23500),
 		newPaperSize("iso_a5_148x210mm", "A5", 14800, 21000),
 		newPaperSize("iso_a6_105x148mm", "A6", 10500, 14800),
@@ -83,7 +83,7 @@ func init() {
 		newPaperSize("iso_c9_38x56mm", "C9 Envelope", 3800, 5600),
 		newPaperSize("iso_c10_29x38mm", "C10 Envelope", 2900, 3800),
 		newPaperSize("iso_dl_110x220mm", "DL Emvelope", 11000, 22000),
-		newPaperSize("iso_id-1_53.98x85.6mm", "ID-1", 5398, 8560), // same as "om_card_54x86mm"
+		newPaperSize("iso_id-1_53.98x85.6mm", "ID-1", 5398, 8560),
 		newPaperSize("iso_ra0_860x1220mm", "RA0", 86000, 122000),
 		newPaperSize("iso_ra1_610x860mm", "RA1", 61000, 86000),
 		newPaperSize("iso_ra2_420x610mm", "RA2", 42000, 61000),
@@ -154,7 +154,7 @@ func init() {
 		newPaperSize("na_foolscap_8.5x13in", "German Legal Fanfold", 8.5*2540, 13*2540),
 		newPaperSize("na_govt-legal_8x13in", "NA Govt. Legal", 8*2540, 13*2540),
 		newPaperSize("na_govt-letter_8x10in", "NA Govt. Letter", 8*2540, 10*2540),
-		newPaperSize("na_index-3x5_3x5in", "3.5x5in", 3.5*2540, 5*2540),
+		newPaperSize("na_index-3x5_3x5in", "3x5in", 3*2540, 5*2540),
 		newPaperSize("na_index-4x6-ext_6x8in", "6x8in", 6*2540, 8*2540),
 		newPaperSize("na_index-4x6_4x6in", "4x6in", 4*2540, 6*2540),
 		newPaperSize("na_index-5x8_5x8in", "5x8in", 5*2540, 8*2540),
@@ -200,7 +200,7 @@ func init() {
 		newPaperSize("om_16k_195x270mm", "16K 195x270mm", 19500, 27000),
 		newPaperSize("om_business-card_55x85mm", "Business Card 55x85mm", 5500, 8500),
 		newPaperSize("om_business-card_55x91mm", "Business Card 55x91mm", 5500, 9100),
-		newPaperSize("om_card_54x86mm", "Card 54x86mm", 5400, 8600), // same as "iso_id-1_53.98x85.6mm"
+		newPaperSize("om_card_54x86mm", "Card 54x86mm", 5400, 8600),
 		newPaperSize("om_card_54x92mm", "Card 54x92mm", 5400, 9200),
 		newPaperSize("om_dai-pa-kai_275x395mm", "Dai-Pa-Kai", 27500, 39500),
 		newPaperSize("om_dsc-photo_89x119mm", "DSC Photo 89x119mm", 8900, 11900),
@@ -235,11 +235,23 @@ func init() {
 	}
 }
 
-func (s *paperSizes) findPaperSizeFromSize(size fyne.Size) *PaperSize {
+func (s *paperSizes) add(size PaperSize) {
+	s.sizes = append(s.sizes, size)
+}
+
+func (s *paperSizes) empty() {
+	s.sizes = []PaperSize{}
+}
+
+func (s *paperSizes) findPaperSizeFromWindowsPaperSize(size fyne.Size) *PaperSize {
 	for _, sz := range s.sizes {
-		if sz.width() == size.Width && sz.height() == size.Height {
+		if int32(size.Width) == int32(sz.width())/10 && int32(size.Height) == int32(sz.height())/10 {
 			return &sz
 		}
 	}
 	return nil
+}
+
+func (s *paperSizes) isEmpty() bool {
+	return len(s.sizes) == 0
 }
