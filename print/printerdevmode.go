@@ -19,7 +19,7 @@ type PrinterDevMode struct {
 	dmDriverExtra      uint16
 	dmFields           uint32
 	dmOrientation      int16
-	dmPaperSize        int16
+	dmPaperSize        dmPaperSize
 	dmPaperLength      int16
 	dmPaperWidth       int16
 	dmScale            int16

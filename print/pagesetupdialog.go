@@ -14,7 +14,7 @@ import (
 // to return data from it.
 type PageSetupInfo struct {
 	printer     *Printer
-	paperSize   string
+	paperSize   *PaperSize
 	orientation string
 }
 
@@ -28,7 +28,7 @@ type PageSetupInfo struct {
 // paper size.
 //
 //	orientation is the paper orientation (portrait or landscape). The default is portrait.
-func NewPageSetupInfo(printer *Printer, paperSize string, orientation string) *PageSetupInfo {
+func NewPageSetupInfo(printer *Printer, paperSize *PaperSize, orientation string) *PageSetupInfo {
 	return &PageSetupInfo{
 		printer:     printer,
 		paperSize:   paperSize,
@@ -145,4 +145,18 @@ func (psd *PageSetupDialog) printerSelected(name string) {
 		dialog.ShowError(err, psd.parent)
 	}
 	psd.paperSizeSelect.Options = pr.paperNames()
+	// set selected
+	if len(pr.pSizes.sizes) > 0 {
+		if psd.pageSetupInfo.paperSize != nil {
+			psd.paperSizeSelect.SetSelected(psd.pageSetupInfo.paperSize.name())
+		} else if len(psd.paperSizeSelect.Options) == 1 {
+			psd.paperSizeSelect.SetSelectedIndex(0)
+		} else {
+			defPS := pr.defaultPaperSize()
+			if defPS != nil {
+				n := defPS.name()
+				psd.paperSizeSelect.SetSelected(n)
+			}
+		}
+	}
 }

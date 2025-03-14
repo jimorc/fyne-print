@@ -26,6 +26,25 @@ func (p *Printer) Comment() string {
 	return p.printerInfo2.Comment()
 }
 
+// defaultPrinterSize returns the PaperSize corresponding to the default paper size for the printer.
+func (p *Printer) defaultPaperSize() *PaperSize {
+	dm := p.printerInfo2.DevMode.dmPaperSize
+	if dm != dmPaperNone {
+		ps := stdPaperSizes.findPaperSizeFromDmPaperSize(dm)
+		if ps != nil {
+			return ps
+		}
+	} else {
+		w := p.printerInfo2.DevMode.dmPaperWidth
+		h := p.printerInfo2.DevMode.dmPaperLength
+		ps := stdPaperSizes.findPaperSizeFromWindowsPaperSize(fyne.NewSize(float32(w), float32(h)))
+		if ps != nil {
+			return ps
+		}
+	}
+	return nil
+}
+
 // Location returns the location set in the printer properties.
 func (p *Printer) Location() string {
 	return p.printerInfo2.Location()
@@ -75,7 +94,7 @@ func (p *Printer) retrievePaperSizes() error {
 		} else {
 			pName := ([paperNameSize]uint16)((pNames[i]))
 			n := syscall.UTF16ToString(pName[:])
-			p.pSizes.add(newPaperSize(n, n, ps.Width*10, ps.Height*10))
+			p.pSizes.add(newPaperSize(n, n, dmPaperNone, ps.Width*10, ps.Height*10))
 			fmt.Printf("Added paper size %s: %v\n", n, ps)
 		}
 	}
