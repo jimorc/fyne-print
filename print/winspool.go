@@ -3,8 +3,11 @@
 package print
 
 import (
+	"fmt"
 	"syscall"
 	"unsafe"
+
+	"fyne.io/fyne/v2"
 )
 
 // Printer enumeration constants. One of more of these may be used to enumerate printers configured on the system.
@@ -25,6 +28,7 @@ var (
 	procDeviceCapabilities = modwinspool.NewProc("DeviceCapabilitiesW")
 	procEnumPrinters       = modwinspool.NewProc("EnumPrintersW")
 	procGetDefaultPrinter  = modwinspool.NewProc("GetDefaultPrinterW")
+	procOpenPrinter        = modwinspool.NewProc("OpenPrinterW")
 )
 
 // devicvCapabilities retrieves the capabilities of a printer driver.
@@ -87,4 +91,19 @@ func getDefaultPrinter(buf *uint16, bufN *uint32) error {
 		uintptr(unsafe.Pointer(buf)),
 		uintptr(unsafe.Pointer(bufN)))
 	return err
+}
+
+func openPrinter(pName string, printerDefs *PrinterDefaults) syscall.Handle {
+	name, _ := syscall.UTF16FromString(pName)
+	var prHandle syscall.Handle
+	r0, _, err := procOpenPrinter.Call(
+		uintptr(unsafe.Pointer(&name[0])),
+		uintptr(unsafe.Pointer(&prHandle)),
+		uintptr(unsafe.Pointer(printerDefs)))
+	if r0 == 0 {
+		eMsg := fmt.Sprintf("Failed to open printer %s", pName)
+		fyne.LogError(eMsg, err)
+		return syscall.Handle(0)
+	}
+	return prHandle
 }

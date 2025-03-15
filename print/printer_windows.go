@@ -11,6 +11,7 @@ import (
 
 // Printer is a struct containing information related to the printer.
 type Printer struct {
+	handle       syscall.Handle
 	printerInfo2 PrinterInfo2
 	pSizes       paperSizes
 }
@@ -18,6 +19,10 @@ type Printer struct {
 // NewPrinter creates a Printer struct based on information provided in the PrinterInfo2 argument.
 func NewPrinter(pInfo2 *PrinterInfo2) *Printer {
 	p := &Printer{printerInfo2: *pInfo2}
+	printerDefs := newPrinterDefaults("RAW", pInfo2.DevMode, printerAccessUser)
+
+	prHandle := openPrinter(p.Name(), printerDefs)
+	p.handle = prHandle
 	return p
 }
 
@@ -65,7 +70,7 @@ func (p *Printer) retrievePaperSizes() error {
 		uintptr(unsafe.Pointer(&pNames)),
 		p.printerInfo2.DevMode)
 
-	if err != syscall.Errno(0) {
+	if count <= 0 && err != syscall.Errno(0) {
 		fyne.LogError("Error retrieving paper names", err)
 		eStr := fmt.Sprintf("error retrieving paper names: %s", err.Error())
 		return errors.New(eStr)
@@ -79,7 +84,7 @@ func (p *Printer) retrievePaperSizes() error {
 		dcPaperSize,
 		uintptr(unsafe.Pointer(&pSizes)),
 		p.printerInfo2.DevMode)
-	if err != syscall.Errno(0) {
+	if count <= 0 && err != syscall.Errno(0) {
 		fyne.LogError("Error retrieving paper sizes", err)
 		eStr := fmt.Sprintf("error retrieving paper sizes: %s", err.Error())
 		return errors.New(eStr)
