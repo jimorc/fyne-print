@@ -93,7 +93,7 @@ func getDefaultPrinter(buf *uint16, bufN *uint32) error {
 	return err
 }
 
-func openPrinter(pName string, printerDefs *PrinterDefaults) syscall.Handle {
+func openPrinter(pName string, printerDefs *printerDefs) syscall.Handle {
 	name, _ := syscall.UTF16FromString(pName)
 	var prHandle syscall.Handle
 	r0, _, err := procOpenPrinter.Call(
