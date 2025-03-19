@@ -145,11 +145,15 @@ type paperSizes struct {
 // stdPaperSizes contains all of the IPP media sizes registered with IANA
 // as of 2024-10-09.
 // newPaperSize arguments:
+//
 //	1: the IPP media size name.
 //	2: the English name for the media size. The name is translated in newPaperSize
+//
 // to the system language if a translation exists.
-//	3: width of the paper in 100ths of a mm for the paper in portrait mode.
-//  4: height of the paper in 100ths of a mm for the paper in portrait mode. That is,
+//
+//		3: width of the paper in 100ths of a mm for the paper in portrait mode.
+//	 4: height of the paper in 100ths of a mm for the paper in portrait mode. That is,
+//
 // the height is always equal to or greater than the width.
 var stdPaperSizes paperSizes
 
@@ -377,6 +381,15 @@ func (s *paperSizes) add(size PaperSize) {
 
 func (s *paperSizes) empty() {
 	s.sizes = []PaperSize{}
+}
+
+func (s *paperSizes) findPaperSizeFromName(name string) *PaperSize {
+	for _, ps := range s.sizes {
+		if ps.name() == name {
+			return &ps
+		}
+	}
+	return nil
 }
 
 // findPaperSizeFromDmPaperSize returns the PaperSize object that matches the
