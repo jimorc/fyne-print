@@ -27,7 +27,7 @@ func NewPrinters() (*Printers, error) {
 	// number of info1 structs returned.
 	var info2Count uint32 = 0
 
-	_, err := EnumPrinters(flags,
+	_, err := enumPrinters(flags,
 		"",
 		2,
 		&buffer[0],
@@ -40,7 +40,7 @@ func NewPrinters() (*Printers, error) {
 	}
 	info2Size = info2Needed
 	buffer = make([]byte, info2Size)
-	_, err = EnumPrinters(flags,
+	_, err = enumPrinters(flags,
 		"",
 		2,
 		&buffer[0],
@@ -54,7 +54,7 @@ func NewPrinters() (*Printers, error) {
 	printers := &Printers{}
 	for _, info2 := range pInfo2 {
 		fmt.Println(info2.string())
-		p := NewPrinter(&info2)
+		p := newPrinter(&info2)
 		printers.Add(p)
 	}
 	return printers, nil

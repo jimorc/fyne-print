@@ -58,7 +58,7 @@ func deviceCapabilities(name string,
 	return int32(r1), err
 }
 
-// EnumPrinters enumerates available printers, print servers, domains, or print providers.
+// enumPrinters enumerates available printers, print servers, domains, or print providers.
 // See https://learn.microsoft.com/en-us/windows/win32/printdocs/enumprinters for information
 // on the arguments.
 //
@@ -66,7 +66,7 @@ func deviceCapabilities(name string,
 //
 //	A bool indicating if the function succeeded.
 //	An error if the function failed.
-func EnumPrinters(flags uint32,
+func enumPrinters(flags uint32,
 	name string,
 	level uint32,
 	buf *byte,
