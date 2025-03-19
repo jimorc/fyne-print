@@ -129,7 +129,11 @@ func (pi2 *PrinterInfo2) Attributes() PrinterAttribute {
 
 // Comment returns the comment associated with the printer.
 func (pi2 *PrinterInfo2) Comment() string {
-	return StringFromUTF16(pi2.comment)
+	if pi2.comment == nil {
+		return ""
+	} else {
+		return StringFromUTF16(pi2.comment)
+	}
 }
 
 // DataType returns the value of the dataType field. This is typically "RAW".
@@ -169,7 +173,11 @@ func (pi2 *PrinterInfo2) PrintProcessor() string {
 
 // SepFile returns the name of the file used to create the separator page.
 func (pi2 *PrinterInfo2) SeparatorFile() string {
-	return StringFromUTF16(pi2.sepFile)
+	if pi2.sepFile == nil {
+		return ""
+	} else {
+		return StringFromUTF16(pi2.sepFile)
+	}
 }
 
 // ServerName returns the name of the print server associated with the printer.
