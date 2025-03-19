@@ -402,3 +402,12 @@ func (s *paperSizes) findPaperSizeFromWindowsPaperSize(size fyne.Size) *PaperSiz
 func (s *paperSizes) isEmpty() bool {
 	return len(s.sizes) == 0
 }
+
+// names returns the names of all paper sizes.
+func (s *paperSizes) names() []string {
+	var names []string
+	for _, ps := range s.sizes {
+		names = append(names, ps.name())
+	}
+	return names
+}

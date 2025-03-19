@@ -24,7 +24,6 @@ func newPrinter(pInfo2 *PrinterInfo2) *Printer {
 
 	prHandle := openPrinter(p.Name(), printerDefs)
 	p.handle = prHandle
-	_ = p.retrievePaperSizes()
 	return p
 }
 
@@ -60,6 +59,18 @@ func (p *Printer) Location() string {
 // Name returns the name of the printer.
 func (p *Printer) Name() string {
 	return p.printerInfo2.Name()
+}
+
+// paperSizes returns the paper sizes for the printer. The first time
+// this method is called, the paper sizes are retrieved.
+func (p *Printer) paperSizes() (paperSizes, error) {
+	if p.pSizes.isEmpty() {
+		err := p.retrievePaperSizes()
+		if err != nil {
+			return p.pSizes, err
+		}
+	}
+	return p.pSizes, nil
 }
 
 func (p *Printer) retrievePaperSizes() error {
@@ -111,12 +122,4 @@ func (p *Printer) retrievePaperSizes() error {
 // PortName returns the port name of the printer.
 func (p *Printer) PortName() string {
 	return p.printerInfo2.PortName()
-}
-
-func (p *Printer) paperNames() []string {
-	var names []string
-	for _, ps := range p.pSizes.sizes {
-		names = append(names, ps.name())
-	}
-	return names
 }

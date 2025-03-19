@@ -140,13 +140,12 @@ func (psd *PageSetupDialog) printerSelected(name string) {
 	}
 	psd.comment.Text = comment
 	psd.comment.Refresh()
-	err := pr.retrievePaperSizes()
+	paperSizes, err := pr.paperSizes()
 	if err != nil {
 		dialog.ShowError(err, psd.parent)
-	}
-	psd.paperSizeSelect.Options = pr.paperNames()
-	// set selected
-	if len(pr.pSizes.sizes) > 0 {
+	} else {
+		psd.paperSizeSelect.Options = paperSizes.names()
+		// set selected
 		if psd.pageSetupInfo.paperSize != nil {
 			psd.paperSizeSelect.SetSelected(psd.pageSetupInfo.paperSize.name())
 		} else if len(psd.paperSizeSelect.Options) == 1 {
