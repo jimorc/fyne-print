@@ -105,6 +105,11 @@ func (p *Printer) retrievePaperSizes() error {
 	p.pSizes.empty()
 	for i := 0; i < int(count); i++ {
 		pSize := intPaperSize(pSizes[i])
+		// ***
+		pName := ([paperNameSize]uint16)((pNames[i]))
+		n := syscall.UTF16ToString(pName[:])
+		fmt.Printf("%s: %v\n", n, pSize)
+		// ***
 		ps := fyne.NewSize(float32(pSize.w), float32(pSize.h))
 		paperSize := stdPaperSizes.findPaperSizeFromWindowsPaperSize(ps)
 		if paperSize != nil {
