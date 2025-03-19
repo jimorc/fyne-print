@@ -16,14 +16,15 @@ type Printer struct {
 	pSizes       paperSizes
 }
 
-// NewPrinter creates a Printer struct based on information provided in the PrinterInfo2 argument.
-func NewPrinter(pInfo2 *PrinterInfo2) *Printer {
+// newPrinter creates a Printer struct based on information provided in the PrinterInfo2 argument.
+func newPrinter(pInfo2 *PrinterInfo2) *Printer {
 	p := &Printer{printerInfo2: *pInfo2}
 	printerDefs := newPrinterDefaults("RAW", pInfo2.DevMode,
 		printerAccessUse)
 
 	prHandle := openPrinter(p.Name(), printerDefs)
 	p.handle = prHandle
+	_ = p.retrievePaperSizes()
 	return p
 }
 
