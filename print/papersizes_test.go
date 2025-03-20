@@ -39,7 +39,7 @@ func TestPaperSizes_findPaperSizeFromWindowsPaperSize(t *testing.T) {
 			name: "Not found",
 			sizes: paperSizes{
 				sizes: []PaperSize{
-					newPaperSize("custom_100x200mm", "Custom", dmPaperNone, 10000, 20000),
+					*newPaperSize("custom_100x200mm", "Custom", dmPaperNone, 10000, 20000),
 				},
 			},
 			inputSize: fyne.NewSize(1500, 2500),
@@ -79,7 +79,7 @@ func TestPaperSizes_findPaperSizeFromWindowsPaperSize(t *testing.T) {
 			name: "custom found",
 			sizes: paperSizes{
 				sizes: []PaperSize{
-					newPaperSize("custom_100x200mm", "Custom", dmPaperNone, 10000, 20000),
+					*newPaperSize("custom_100x200mm", "Custom", dmPaperNone, 10000, 20000),
 				},
 			},
 			inputSize: fyne.NewSize(1000, 2000),
@@ -137,9 +137,9 @@ func Test_paperSizes_findPaperSizeFromDmPaperSize(t *testing.T) {
 	// Add some test paper sizes to the stdPaperSizes for testing
 	customPaperSizes := paperSizes{
 		sizes: []PaperSize{
-			newPaperSize("iso_a4_210x297mm", "A4", dmPaperA4, 21000, 29700),
-			newPaperSize("na_letter_8.5x11in", "NA Letter", dmPaperLetter, 8.5*2540, 11*2540),
-			newPaperSize("custom_100x200mm", "Custom", dmPaperNone, 10000, 20000),
+			*newPaperSize("iso_a4_210x297mm", "A4", dmPaperA4, 21000, 29700),
+			*newPaperSize("na_letter_8.5x11in", "NA Letter", dmPaperLetter, 8.5*2540, 11*2540),
+			*newPaperSize("custom_100x200mm", "Custom", dmPaperNone, 10000, 20000),
 		},
 	}
 

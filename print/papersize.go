@@ -16,8 +16,8 @@ type Margin struct {
 	right  float32
 }
 
-// NewMargin creates a Margin struct for the values input.
-func NewMargin(top, bottom, left, right float32) Margin {
+// newMargin creates a Margin struct for the values input.
+func newMargin(top, bottom, left, right float32) Margin {
 	return Margin{top: top, bottom: bottom, left: left, right: right}
 }
 
@@ -28,6 +28,7 @@ type PaperSize struct {
 	winSize dmPaperSize
 	w       float32
 	h       float32
+	mrg     Margin
 }
 
 // newPaperSize creates a PaperSize struct for the values input.
@@ -46,15 +47,27 @@ type PaperSize struct {
 //
 //	width is the width in 100ths of a mm for the media in portrait mode.
 //	height is the height in 100ths of a mm for the media in portrait mode.
-func newPaperSize(psName string, name string, wSize dmPaperSize, width float32, height float32) PaperSize {
+func newPaperSize(psName string, name string, wSize dmPaperSize, width float32, height float32) *PaperSize {
 	ps := PaperSize{psN: psName, winSize: wSize, w: width, h: height}
 	ps.n = lang.L(name)
+	return &ps
+}
+
+func newPaperSizeWithMargin(psName string, name string, wSize dmPaperSize,
+	width float32, height float32, margin Margin) *PaperSize {
+	ps := newPaperSize(psName, name, wSize, width, height)
+	ps.mrg = margin
 	return ps
 }
 
 // Height retrieves the height in 100ths of a mm of the PaperSize object.
 func (ps PaperSize) height() float32 {
 	return ps.h
+}
+
+// margin retrieves the Margin from the PaperSize object.
+func (ps PaperSize) margin() Margin {
+	return ps.mrg
 }
 
 // Name retrieves the translated paper size common name.
