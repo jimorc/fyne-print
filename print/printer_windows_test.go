@@ -10,12 +10,12 @@ func TestPrinter_defaultPaperSize(t *testing.T) {
 	// Create some custom paper sizes for testing
 	customPaperSizes := paperSizes{
 		sizes: []PaperSize{
-			newPaperSize("iso_a4_210x297mm", "A4", dmPaperA4, 21000, 29700),
-			newPaperSize("na_letter_8.5x11in", "NA Letter", dmPaperLetter, 8.5*2540, 11*2540),
-			newPaperSize("Custom_size", "Custom", dmPaperNone, 1000, 2000),
-			newPaperSize("custom_150x250mm", "Custom2", dmPaperNone, 15000, 25000),
-			newPaperSize("custom_200x300mm", "Custom3", dmPaperNone, 20000, 30000),
-			newPaperSize("Custom_size_with_.5", "Custom_4", dmPaperNone, 85050, 110070),
+			*newPaperSize("iso_a4_210x297mm", "A4", dmPaperA4, 21000, 29700),
+			*newPaperSize("na_letter_8.5x11in", "NA Letter", dmPaperLetter, 8.5*2540, 11*2540),
+			*newPaperSize("Custom_size", "Custom", dmPaperNone, 1000, 2000),
+			*newPaperSize("custom_150x250mm", "Custom2", dmPaperNone, 15000, 25000),
+			*newPaperSize("custom_200x300mm", "Custom3", dmPaperNone, 20000, 30000),
+			*newPaperSize("Custom_size_with_.5", "Custom_4", dmPaperNone, 85050, 110070),
 		},
 	}
 	tests := []struct {

@@ -117,7 +117,7 @@ func (p *Printer) retrievePaperSizes() error {
 		} else {
 			pName := ([paperNameSize]uint16)((pNames[i]))
 			n := syscall.UTF16ToString(pName[:])
-			p.pSizes.add(newPaperSize(n, n, dmPaperNone, ps.Width*10, ps.Height*10))
+			p.pSizes.add(*newPaperSize(n, n, dmPaperNone, ps.Width*10, ps.Height*10))
 			fmt.Printf("Added paper size %s: %v\n", n, ps)
 		}
 	}
