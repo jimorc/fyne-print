@@ -1,3 +1,5 @@
+//go:build !windoews
+
 package main
 
 import (
@@ -17,6 +19,10 @@ func main() {
 		fmt.Println("    Options:")
 		for k, v := range pr.Options() {
 			fmt.Printf("        %s: %s\n", k, v)
+		}
+		caps := pr.Capabilities().AsStrings()
+		for _, cap := range caps {
+			fmt.Printf("        %s\n", cap)
 		}
 	}
 }

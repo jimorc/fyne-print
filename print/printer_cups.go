@@ -4,11 +4,15 @@ package print
 
 // #include "cups/cups.h"
 import "C"
-import "unsafe"
+import (
+	"strconv"
+	"unsafe"
+)
 
 // Printer represents a CUPS printer
 type Printer struct {
 	dest *C.cups_dest_t
+	caps capabilities
 }
 
 // newPrinter creates a new Printer object.
@@ -18,7 +22,17 @@ type Printer struct {
 //	dest is the CUPS destination for the printer.
 func newPrinter(dest *C.cups_dest_t) *Printer {
 	p := &Printer{dest: dest}
+	opts := p.Options()
+	caps := opts["printer-type"]
+	if len(caps) > 0 {
+		c, _ := strconv.Atoi(caps)
+		p.caps = capabilities(uint32(c))
+	}
 	return p
+}
+
+func (p *Printer) Capabilities() capabilities {
+	return p.caps
 }
 
 // Close frees any CUPS memory allocations for the Printer.
