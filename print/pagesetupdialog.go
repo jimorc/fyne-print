@@ -95,67 +95,78 @@ func (psd *PageSetupDialog) createPrinterContainer() *fyne.Container {
 }
 
 func (psd *PageSetupDialog) populatePrinterSelect(parent fyne.Window) {
-	ps, err := NewPrinters()
-	if err != nil {
-		fyne.LogError("Error retrieving printers", err)
-		err1 := errors.New("Error retrieving list of printers:\n" +
-			err.Error() +
+	ps := NewPrinters()
+	if len(ps.Printers) == 0 {
+		err := errors.New("no printers were found")
+		fyne.LogError("", err)
+		err1 := errors.New(err.Error() +
 			"\nCannot continue page setup.")
 		dialog.ShowError(err1, parent)
 		return
 	}
 	psd.printers = ps
-	prNames := psd.printers.getNames()
-	psd.printerSelect.Options = prNames
+	/*
+	   prNames := psd.printers.getNames()
+	   psd.printerSelect.Options = prNames
 
-	// set selected
-	if len(prNames) > 0 {
-		if psd.pageSetupInfo.printer != nil {
-			psd.printerSelect.SetSelected(psd.pageSetupInfo.printer.Name())
-		} else if len(prNames) == 1 {
-			psd.printerSelect.SetSelected(prNames[0])
-		} else {
-			defPr := psd.printers.DefaultPrinter()
-			if defPr != nil {
-				psd.printerSelect.SetSelected(defPr.Name())
-			}
-		}
-	}
+	   // set selected
+
+	   	if len(prNames) > 0 {
+	   		if psd.pageSetupInfo.printer != nil {
+	   			psd.printerSelect.SetSelected(psd.pageSetupInfo.printer.Name())
+	   		} else if len(prNames) == 1 {
+	   			psd.printerSelect.SetSelected(prNames[0])
+	   		} else {
+	   			defPr := psd.printers.DefaultPrinter()
+	   			if defPr != nil {
+	   				psd.printerSelect.SetSelected(defPr.Name())
+	   			}
+	   		}
+	   	}
+	*/
 }
 
 func (psd *PageSetupDialog) printerSelected(name string) {
 	if psd.printers == nil {
 		return
 	}
-	pr := psd.printers.getPrinterByName(name)
-	loc := ""
-	if pr != nil && pr.Name() == name {
-		loc = pr.Location()
-	}
-	psd.location.Text = loc
-	psd.location.Refresh()
-	comment := ""
-	if pr != nil && pr.Name() == name {
-		comment = pr.Comment()
-	}
-	psd.comment.Text = comment
-	psd.comment.Refresh()
-	paperSizes, err := pr.paperSizes()
-	if err != nil {
-		dialog.ShowError(err, psd.parent)
-	} else {
-		psd.paperSizeSelect.Options = paperSizes.names()
-		// set selected
-		if psd.pageSetupInfo.paperSize != nil {
-			psd.paperSizeSelect.SetSelected(psd.pageSetupInfo.paperSize.name())
-		} else if len(psd.paperSizeSelect.Options) == 1 {
-			psd.paperSizeSelect.SetSelectedIndex(0)
-		} else {
-			defPS := pr.defaultPaperSize()
-			if defPS != nil {
-				n := defPS.name()
-				psd.paperSizeSelect.SetSelected(n)
-			}
-		}
-	}
+	/*
+	   pr := psd.printers.getPrinterByName(name)
+	   loc := ""
+
+	   	if pr != nil && pr.Name() == name {
+	   		loc = pr.Location()
+	   	}
+
+	   psd.location.Text = loc
+	   psd.location.Refresh()
+	   comment := ""
+
+	   	if pr != nil && pr.Name() == name {
+	   		comment = pr.Comment()
+	   	}
+
+	   psd.comment.Text = comment
+	   psd.comment.Refresh()
+	   paperSizes, err := pr.paperSizes()
+
+	   	if err != nil {
+	   		dialog.ShowError(err, psd.parent)
+	   	} else {
+
+	   		psd.paperSizeSelect.Options = paperSizes.names()
+	   		// set selected
+	   		if psd.pageSetupInfo.paperSize != nil {
+	   			psd.paperSizeSelect.SetSelected(psd.pageSetupInfo.paperSize.name())
+	   		} else if len(psd.paperSizeSelect.Options) == 1 {
+	   			psd.paperSizeSelect.SetSelectedIndex(0)
+	   		} else {
+	   			defPS := pr.defaultPaperSize()
+	   			if defPS != nil {
+	   				n := defPS.name()
+	   				psd.paperSizeSelect.SetSelected(n)
+	   			}
+	   		}
+	   	}
+	*/
 }

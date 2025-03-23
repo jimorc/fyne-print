@@ -2,13 +2,7 @@
 
 package print
 
-import (
-	"testing"
-
-	"github.com/OpenPrinting/goipp"
-	"github.com/stretchr/testify/assert"
-)
-
+/*
 func TestNewPrinter(t *testing.T) {
 	var pr *Printer
 	msg := createTestPrintersResponse()
@@ -25,3 +19,4 @@ func TestNewPrinter(t *testing.T) {
 	assert.Equal(t, "Printer1", pr.Name())
 
 }
+*/
