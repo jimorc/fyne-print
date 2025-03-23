@@ -25,6 +25,13 @@ func (p *Printer) Close() {
 	p.dest = nil
 }
 
+// Instance retrieves the printer Instance from the CUPS desination object
+// associated with the Printer.
+// This may be an empty string.
+func (p *Printer) Instance() string {
+	return C.GoString(p.dest.instance)
+}
+
 // Name retrieves the printer Name from the CUPS destination object associated
 // with the Printer.
 func (p *Printer) Name() string {
