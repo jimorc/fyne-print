@@ -14,5 +14,9 @@ func main() {
 		fmt.Printf("    Name: %s\n", pr.Name())
 		fmt.Printf("    Instance: %s\n", pr.Instance())
 		fmt.Printf("    IsDefault: %t\n", pr.IsDefault())
+		fmt.Println("    Options:")
+		for k, v := range pr.Options() {
+			fmt.Printf("        %s: %s\n", k, v)
+		}
 	}
 }
