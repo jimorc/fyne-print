@@ -25,11 +25,17 @@ func (p *Printer) Close() {
 	p.dest = nil
 }
 
-// Instance retrieves the printer Instance from the CUPS desination object
+// Instance retrieves the printer Instance from the CUPS destination object
 // associated with the Printer.
 // This may be an empty string.
 func (p *Printer) Instance() string {
 	return C.GoString(p.dest.instance)
+}
+
+// IsDefault returns whether the printer's CUPS destination object indicates that
+// this printer is the default.
+func (p *Printer) IsDefault() bool {
+	return !(p.dest.is_default == 0)
 }
 
 // Name retrieves the printer Name from the CUPS destination object associated

@@ -13,5 +13,6 @@ func main() {
 		fmt.Printf("Printer %d:\n", i)
 		fmt.Printf("    Name: %s\n", pr.Name())
 		fmt.Printf("    Instance: %s\n", pr.Instance())
+		fmt.Printf("    IsDefault: %t\n", pr.IsDefault())
 	}
 }
