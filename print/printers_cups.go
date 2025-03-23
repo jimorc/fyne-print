@@ -8,6 +8,8 @@ import "unsafe"
 
 // Printers is the object containing all of the CUPS Printer objects.
 type Printers struct {
+	dests    *C.cups_dest_t
+	nDests   C.int
 	Printers []Printer
 }
 
@@ -15,11 +17,10 @@ type Printers struct {
 func NewPrinters() *Printers {
 	ps := &Printers{}
 	var dests *C.cups_dest_t
-	nDests := C.cupsGetDests(&dests)
-	defer C.cupsFreeDests(nDests, dests)
-	pDest := unsafe.Pointer(dests)
+	ps.nDests = C.cupsGetDests(&ps.dests)
+	pDest := unsafe.Pointer(ps.dests)
 
-	for i := 0; i < int(nDests); i++ {
+	for i := 0; i < int(ps.nDests); i++ {
 		d := (*C.cups_dest_t)(unsafe.Pointer(uintptr(pDest) + uintptr(i)*unsafe.Sizeof(*dests)))
 		pr := newPrinter(d)
 		ps.Printers = append(ps.Printers, *pr)
@@ -32,5 +33,6 @@ func (p *Printers) Close() {
 	for _, pr := range p.Printers {
 		pr.Close()
 	}
+	C.cupsFreeDests(p.nDests, p.dests)
 	p.Printers = nil
 }

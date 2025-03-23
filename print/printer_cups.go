@@ -4,7 +4,6 @@ package print
 
 // #include "cups/cups.h"
 import "C"
-import "fmt"
 
 // Printer represents a CUPS printer
 type Printer struct {
@@ -17,14 +16,17 @@ type Printer struct {
 //
 //	dest is the CUPS destination for the printer.
 func newPrinter(dest *C.cups_dest_t) *Printer {
-	p := &Printer{}
-	c := C.cupsCopyDest(dest, 1, &p.dest)
-	fmt.Printf("newPrinter: c=%d\n", int(c))
+	p := &Printer{dest: dest}
 	return p
 }
 
 // Close frees any CUPS memory allocations for the Printer.
 func (p *Printer) Close() {
-	C.cupsFreeDests(1, p.dest)
 	p.dest = nil
+}
+
+// Name retrieves the printer Name from the CUPS destination object associated
+// with the Printer.
+func (p *Printer) Name() string {
+	return C.GoString(p.dest.name)
 }
