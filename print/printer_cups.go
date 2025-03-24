@@ -5,14 +5,17 @@ package print
 // #include "cups/cups.h"
 import "C"
 import (
+	"fmt"
 	"strconv"
 	"unsafe"
 )
 
 // Printer represents a CUPS printer
 type Printer struct {
-	dest *C.cups_dest_t
-	caps capabilities
+	http  *C.http_t
+	dest  *C.cups_dest_t
+	dinfo *C.cups_dinfo_t
+	caps  capabilities
 }
 
 // newPrinter creates a new Printer object.
@@ -28,6 +31,24 @@ func newPrinter(dest *C.cups_dest_t) *Printer {
 		c, _ := strconv.Atoi(caps)
 		p.caps = capabilities(uint32(c))
 	}
+	p.http = C.cupsConnectDest(p.dest, C.CUPS_DEST_FLAGS_NONE,
+		2000, nil, nil, 0, nil, nil)
+	p.dinfo = C.cupsCopyDestInfo(p.http, p.dest)
+
+	mCount := C.cupsGetDestMediaCount(p.http, p.dest, p.dinfo, 0)
+	fmt.Printf("Media count: %d\n", mCount)
+	for i := 0; i < int(mCount); i++ {
+		var mSize C.cups_size_t
+
+		res := C.cupsGetDestMediaByIndex(p.http, p.dest, p.dinfo, C.int(i),
+			0, &mSize)
+
+		fmt.Printf("MediaByIndex2 result: %d\n", res)
+		if res == 1 {
+			fmt.Printf("Media Name: %s\n", C.GoString(&mSize.media[0]))
+			fmt.Printf("Media Size: %v\n", mSize)
+		}
+	}
 	return p
 }
 
@@ -37,6 +58,10 @@ func (p *Printer) Capabilities() capabilities {
 
 // Close frees any CUPS memory allocations for the Printer.
 func (p *Printer) Close() {
+	C.httpClose(p.http)
+	C.cupsFreeDestInfo(p.dinfo)
+	p.dinfo = nil
+	p.http = nil
 	p.dest = nil
 }
 
