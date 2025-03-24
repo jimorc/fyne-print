@@ -106,25 +106,25 @@ func (psd *PageSetupDialog) populatePrinterSelect(parent fyne.Window) {
 		return
 	}
 	psd.printers = ps
-	/*
-	   prNames := psd.printers.getNames()
-	   psd.printerSelect.Options = prNames
 
-	   // set selected
+	prNames := psd.printers.PrinterNames()
+	psd.printerSelect.Options = prNames
 
-	   	if len(prNames) > 0 {
-	   		if psd.pageSetupInfo.printer != nil {
-	   			psd.printerSelect.SetSelected(psd.pageSetupInfo.printer.Name())
-	   		} else if len(prNames) == 1 {
-	   			psd.printerSelect.SetSelected(prNames[0])
-	   		} else {
-	   			defPr := psd.printers.DefaultPrinter()
-	   			if defPr != nil {
-	   				psd.printerSelect.SetSelected(defPr.Name())
-	   			}
-	   		}
-	   	}
-	*/
+	// set selected
+
+	if len(prNames) > 0 {
+		if psd.pageSetupInfo.printer != nil {
+			psd.printerSelect.SetSelected(psd.pageSetupInfo.printer.Name())
+		} else if len(prNames) == 1 {
+			psd.printerSelect.SetSelected(prNames[0])
+		} else {
+			defPr := psd.printers.DefaultPrinter()
+			if defPr != nil {
+				psd.printerSelect.SetSelected(defPr.Name())
+			}
+		}
+	}
+
 }
 
 func (psd *PageSetupDialog) printerSelected(name string) {

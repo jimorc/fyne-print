@@ -36,3 +36,22 @@ func (p *Printers) Close() {
 	C.cupsFreeDests(p.nDests, p.dests)
 	p.Printers = nil
 }
+
+// DefaultPrinter returns the default printer.
+func (p *Printers) DefaultPrinter() *Printer {
+	for _, pr := range p.Printers {
+		if pr.IsDefault() {
+			return &pr
+		}
+	}
+	return nil
+}
+
+// PrinterNames returns the names of all printers.
+func (p *Printers) PrinterNames() []string {
+	var names []string
+	for _, pr := range p.Printers {
+		names = append(names, pr.Name())
+	}
+	return names
+}

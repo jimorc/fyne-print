@@ -6,7 +6,6 @@ package print
 import "C"
 import (
 	"errors"
-	"fmt"
 	"strconv"
 	"unsafe"
 
@@ -40,7 +39,6 @@ func newPrinter(dest *C.cups_dest_t) *Printer {
 	p.dinfo = C.cupsCopyDestInfo(p.http, p.dest)
 
 	mCount := C.cupsGetDestMediaCount(p.http, p.dest, p.dinfo, 0)
-	fmt.Printf("Media count: %d\n", mCount)
 	for i := 0; i < int(mCount); i++ {
 		var mSize C.cups_size_t
 
