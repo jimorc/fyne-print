@@ -24,5 +24,6 @@ func main() {
 		for _, cap := range caps {
 			fmt.Printf("        %s\n", cap)
 		}
+		fmt.Println(pr.MediaSizes().AsString())
 	}
 }

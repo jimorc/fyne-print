@@ -5,17 +5,21 @@ package print
 // #include "cups/cups.h"
 import "C"
 import (
+	"errors"
 	"fmt"
 	"strconv"
 	"unsafe"
+
+	"fyne.io/fyne/v2"
 )
 
 // Printer represents a CUPS printer
 type Printer struct {
-	http  *C.http_t
-	dest  *C.cups_dest_t
-	dinfo *C.cups_dinfo_t
-	caps  capabilities
+	http       *C.http_t
+	dest       *C.cups_dest_t
+	dinfo      *C.cups_dinfo_t
+	caps       capabilities
+	mediaSizes MediaSizes
 }
 
 // newPrinter creates a new Printer object.
@@ -42,16 +46,23 @@ func newPrinter(dest *C.cups_dest_t) *Printer {
 
 		res := C.cupsGetDestMediaByIndex(p.http, p.dest, p.dinfo, C.int(i),
 			0, &mSize)
-
-		fmt.Printf("MediaByIndex2 result: %d\n", res)
-		if res == 1 {
-			fmt.Printf("Media Name: %s\n", C.GoString(&mSize.media[0]))
-			fmt.Printf("Media Size: %v\n", mSize)
+		if res == 0 {
+			e := C.cupsLastErrorString()
+			fyne.LogError("Error getting media size", errors.New(C.GoString(e)))
+			continue
 		}
+		s := newMediaSize(&mSize, p)
+		p.mediaSizes.Add(s)
 	}
 	return p
 }
 
+// AddMediaSize adds a MediaSize object to the printer object.
+func (p *Printer) AddMediaSize(s *MediaSize) {
+	p.mediaSizes.Add(*s)
+}
+
+// Capabilities retrieves the printer's capabilities value.
 func (p *Printer) Capabilities() capabilities {
 	return p.caps
 }
@@ -78,12 +89,19 @@ func (p *Printer) IsDefault() bool {
 	return !(p.dest.is_default == 0)
 }
 
+// MediaSizes returns the media sizes for the printer.
+func (p *Printer) MediaSizes() MediaSizes {
+	return p.mediaSizes
+}
+
 // Name retrieves the printer Name from the CUPS destination object associated
 // with the Printer.
 func (p *Printer) Name() string {
 	return C.GoString(p.dest.name)
 }
 
+// Options retrieves a map containing the options values as retrieved as
+// part of the printer's dest value.
 func (p *Printer) Options() map[string]string {
 	options := make(map[string]string)
 	oPtr := uintptr(unsafe.Pointer(p.dest.options))

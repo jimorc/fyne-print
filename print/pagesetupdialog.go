@@ -13,8 +13,8 @@ import (
 // PageSetupInfo contains information used to initialize the widgets in the PageSetupDialog and
 // to return data from it.
 type PageSetupInfo struct {
-	printer     *Printer
-	paperSize   *PaperSize
+	printer *Printer
+	//	paperSize   *PaperSize
 	orientation string
 }
 
@@ -28,10 +28,11 @@ type PageSetupInfo struct {
 // paper size.
 //
 //	orientation is the paper orientation (portrait or landscape). The default is portrait.
-func NewPageSetupInfo(printer *Printer, paperSize *PaperSize, orientation string) *PageSetupInfo {
+func NewPageSetupInfo(printer *Printer, //paperSize *PaperSize,
+	orientation string) *PageSetupInfo {
 	return &PageSetupInfo{
-		printer:     printer,
-		paperSize:   paperSize,
+		printer: printer,
+		//		paperSize:   paperSize,
 		orientation: orientation,
 	}
 }
