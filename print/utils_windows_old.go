@@ -1,5 +1,6 @@
 package print
 
+/*
 import (
 	"syscall"
 	"unsafe"
@@ -18,3 +19,4 @@ func StringFromUTF16(utf16 *uint16) string {
 	return syscall.UTF16ToString(pSlice)
 
 }
+*/

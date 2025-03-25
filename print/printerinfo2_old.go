@@ -2,6 +2,7 @@
 
 package print
 
+/*
 import (
 	"fmt"
 	"strings"
@@ -388,3 +389,4 @@ func parsePrinterStatus(status PrinterStatus) string {
 	}
 	return pStatus.String()
 }
+*/

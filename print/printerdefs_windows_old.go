@@ -1,5 +1,6 @@
 package print
 
+/*
 import "syscall"
 
 // printerAccessRights is the type for printer access rights. Imagine that!
@@ -34,3 +35,4 @@ func newPrinterDefaults(dType string,
 	dt, _ := syscall.UTF16FromString(dType)
 	return &printerDefs{defType: &dt[0], devMode: dm, access: access}
 }
+*/

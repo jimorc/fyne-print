@@ -1,5 +1,6 @@
 package print
 
+/*
 import (
 	"fmt"
 	"syscall"
@@ -105,3 +106,4 @@ func (p *Printers) getNames() []string {
 	}
 	return names
 }
+*/

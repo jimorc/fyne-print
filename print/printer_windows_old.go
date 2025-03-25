@@ -1,5 +1,6 @@
 package print
 
+/*
 import (
 	"errors"
 	"fmt"
@@ -128,3 +129,4 @@ func (p *Printer) retrievePaperSizes() error {
 func (p *Printer) PortName() string {
 	return p.printerInfo2.PortName()
 }
+*/

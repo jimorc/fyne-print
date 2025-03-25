@@ -3,11 +3,7 @@
 package print
 
 import (
-	"fmt"
 	"syscall"
-	"unsafe"
-
-	"fyne.io/fyne/v2"
 )
 
 // Printer enumeration constants. One of more of these may be used to enumerate printers configured on the system.
@@ -31,6 +27,7 @@ var (
 	procOpenPrinter        = modwinspool.NewProc("OpenPrinterW")
 )
 
+/*
 // devicvCapabilities retrieves the capabilities of a printer driver.
 // See https://learn.microsoft.com/en-us/windows/win32/printdocs/documentproperties
 // for information on the arguments.
@@ -107,3 +104,4 @@ func openPrinter(pName string, printerDefs *printerDefs) syscall.Handle {
 	}
 	return prHandle
 }
+*/

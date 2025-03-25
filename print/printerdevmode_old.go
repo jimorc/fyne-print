@@ -2,6 +2,7 @@
 
 package print
 
+/*
 import (
 	"fmt"
 	"strings"
@@ -145,3 +146,4 @@ func CopyDM(src *PrinterDevMode) *PrinterDevMode {
 
 	return dst
 }
+*/
