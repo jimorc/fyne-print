@@ -55,3 +55,13 @@ func (p *Printers) PrinterNames() []string {
 	}
 	return names
 }
+
+// getPrinterByName returns the printer with the specified name.
+func (p *Printers) getPrinterByName(name string) *Printer {
+	for _, pr := range p.Printers {
+		if pr.Name() == name {
+			return &pr
+		}
+	}
+	return nil
+}

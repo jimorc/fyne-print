@@ -13,8 +13,8 @@ import (
 // PageSetupInfo contains information used to initialize the widgets in the PageSetupDialog and
 // to return data from it.
 type PageSetupInfo struct {
-	printer *Printer
-	//	paperSize   *PaperSize
+	printer     *Printer
+	mediaSize   *MediaSize
 	orientation string
 }
 
@@ -131,43 +131,27 @@ func (psd *PageSetupDialog) printerSelected(name string) {
 	if psd.printers == nil {
 		return
 	}
-	/*
-	   pr := psd.printers.getPrinterByName(name)
-	   loc := ""
+	pr := psd.printers.getPrinterByName(name)
+	loc := ""
 
-	   	if pr != nil && pr.Name() == name {
-	   		loc = pr.Location()
-	   	}
+	if pr != nil && pr.Name() == name {
+		loc = pr.Location()
+	}
 
-	   psd.location.Text = loc
-	   psd.location.Refresh()
-	   comment := ""
-
-	   	if pr != nil && pr.Name() == name {
-	   		comment = pr.Comment()
-	   	}
-
-	   psd.comment.Text = comment
-	   psd.comment.Refresh()
-	   paperSizes, err := pr.paperSizes()
-
-	   	if err != nil {
-	   		dialog.ShowError(err, psd.parent)
-	   	} else {
-
-	   		psd.paperSizeSelect.Options = paperSizes.names()
-	   		// set selected
-	   		if psd.pageSetupInfo.paperSize != nil {
-	   			psd.paperSizeSelect.SetSelected(psd.pageSetupInfo.paperSize.name())
-	   		} else if len(psd.paperSizeSelect.Options) == 1 {
-	   			psd.paperSizeSelect.SetSelectedIndex(0)
-	   		} else {
-	   			defPS := pr.defaultPaperSize()
-	   			if defPS != nil {
-	   				n := defPS.name()
-	   				psd.paperSizeSelect.SetSelected(n)
-	   			}
-	   		}
-	   	}
-	*/
+	psd.location.Text = loc
+	psd.location.Refresh()
+	psd.paperSizeSelect.Options = pr.MediaNames()
+	// set selected
+	if psd.pageSetupInfo.mediaSize != nil {
+		psd.paperSizeSelect.SetSelected(psd.pageSetupInfo.mediaSize.LocalName())
+	} else if len(psd.paperSizeSelect.Options) == 1 {
+		psd.paperSizeSelect.SetSelectedIndex(0)
+		/*	} else {
+			defPS := pr.defaultPaperSize()
+			if defPS != nil {
+				n := defPS.name()
+				psd.paperSizeSelect.SetSelected(n)
+			}
+		}*/
+	}
 }

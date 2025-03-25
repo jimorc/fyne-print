@@ -87,6 +87,22 @@ func (p *Printer) IsDefault() bool {
 	return !(p.dest.is_default == 0)
 }
 
+// Location returns the printer's location as provided in the printer's dest options.
+func (p *Printer) Location() string {
+	options := p.Options()
+	return options["printer-location"]
+}
+
+// MediaNames returns a slice of all local media names for the printer.
+func (p *Printer) MediaNames() []string {
+	var names []string
+	for _, m := range p.mediaSizes {
+		names = append(names, m.LocalName())
+	}
+	return names
+
+}
+
 // MediaSizes returns the media sizes for the printer.
 func (p *Printer) MediaSizes() MediaSizes {
 	return p.mediaSizes

@@ -6,7 +6,6 @@ require (
 	fyne.io/fyne/v2 v2.5.4
 	fyne.io/x/fyne v0.0.0-20250106132206-3228f6c50107
 	github.com/OpenPrinting/goipp v1.1.0
-	github.com/famz/SetLocale v0.0.0-20140414113655-0457ad1065dd
 	github.com/stretchr/testify v1.8.4
 )
 
