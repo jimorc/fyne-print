@@ -6,8 +6,10 @@ import (
 	"syscall"
 )
 
+/*
 // Printer enumeration constants. One of more of these may be used to enumerate printers configured on the system.
 const (
+
 	PRINTER_ENUM_DEFAULT     uint32 = 0x1
 	PRINTER_ENUM_LOCAL       uint32 = 0x2
 	PRINTER_ENUM_CONNECTIONS uint32 = 0x4
@@ -16,8 +18,9 @@ const (
 	PRINTER_ENUM_REMOTE      uint32 = 0x10
 	PRINTER_ENUM_SHARED      uint32 = 0x20
 	PRINTER_ENUM_NETWORK     uint32 = 0x40
-)
 
+)
+*/
 var (
 	modwinspool = syscall.NewLazyDLL("winspool.drv")
 
