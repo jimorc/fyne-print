@@ -3,7 +3,11 @@
 package print
 
 import (
+	"fmt"
 	"syscall"
+	"unsafe"
+
+	"fyne.io/fyne/v2"
 )
 
 /*
@@ -43,21 +47,22 @@ var (
 // If the function returns -1, this may mean either that the capability is not supported or
 // there was a general function failure.
 func deviceCapabilities(name string,
-	port string,
-	capability devCapIndex,
-	output uintptr,
-	devMode *PrinterDevMode) (int32, error) {
-	n, _ := syscall.UTF16FromString(name)
-	p, _ := syscall.UTF16FromString(port)
-	r1, _, err := procDeviceCapabilities.Call(
-		uintptr(unsafe.Pointer(&n[0])),
-		uintptr(unsafe.Pointer(&p[0])),
-		uintptr(capability),
-		output,
-		uintptr(unsafe.Pointer(devMode)))
-	return int32(r1), err
-}
 
+		port string,
+		capability devCapIndex,
+		output uintptr,
+		devMode *PrinterDevMode) (int32, error) {
+		n, _ := syscall.UTF16FromString(name)
+		p, _ := syscall.UTF16FromString(port)
+		r1, _, err := procDeviceCapabilities.Call(
+			uintptr(unsafe.Pointer(&n[0])),
+			uintptr(unsafe.Pointer(&p[0])),
+			uintptr(capability),
+			output,
+			uintptr(unsafe.Pointer(devMode)))
+		return int32(r1), err
+	}
+*/
 // enumPrinters enumerates available printers, print servers, domains, or print providers.
 // See https://learn.microsoft.com/en-us/windows/win32/printdocs/enumprinters for information
 // on the arguments.
@@ -85,15 +90,17 @@ func enumPrinters(flags uint32,
 	return r1 != 0, err
 }
 
+/*
 // getDefaultPrinter returns default printer information.
-func getDefaultPrinter(buf *uint16, bufN *uint32) error {
-	_, _, err := procGetDefaultPrinter.Call(
-		uintptr(unsafe.Pointer(buf)),
-		uintptr(unsafe.Pointer(bufN)))
-	return err
-}
 
-func openPrinter(pName string, printerDefs *printerDefs) syscall.Handle {
+	func getDefaultPrinter(buf *uint16, bufN *uint32) error {
+		_, _, err := procGetDefaultPrinter.Call(
+			uintptr(unsafe.Pointer(buf)),
+			uintptr(unsafe.Pointer(bufN)))
+		return err
+	}
+*/
+func openPrinter(pName string, printerDefs *PrinterDefaults) syscall.Handle {
 	name, _ := syscall.UTF16FromString(pName)
 	var prHandle syscall.Handle
 	r0, _, err := procOpenPrinter.Call(
@@ -107,4 +114,3 @@ func openPrinter(pName string, printerDefs *printerDefs) syscall.Handle {
 	}
 	return prHandle
 }
-*/
