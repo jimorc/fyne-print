@@ -48,8 +48,8 @@ func (d *devMode) DriverExtra() uint16 {
 // Fields specifies bit flags identifying which of the following DEVMODEW members
 // are in use. For example, the DM_ORIENTATION flag is set when the dmOrientation
 // member contains valid data. The DM_XXX flags are defined in wingdi.h.
-func (d *devMode) Fields() uint32 {
-	return uint32(d.dmFields)
+func (d *devMode) Fields() devModeFields {
+	return devModeFields(d.dmFields)
 }
 
 // Orientation returns the printer's paper orientation. Valid values are
@@ -221,9 +221,9 @@ func (d *devMode) String() string {
 	s.WriteString(fmt.Sprintf("    Device Name: %s\n", d.DeviceName()))
 	s.WriteString(fmt.Sprintf("    Spec Version: %d\n", d.SpecVersion()))
 	s.WriteString(fmt.Sprintf("    Driver Version: %d\n", d.DriverVersion()))
-	s.WriteString(fmt.Sprintf("    Size: %d\n", d.Size()))
-	s.WriteString(fmt.Sprintf("    Driver Extra: %d\n", d.DriverExtra()))
-	s.WriteString(fmt.Sprintf("    Fields: %d\n", d.Fields()))
+	s.WriteString(fmt.Sprintf("    Size: %d bytes\n", d.Size()))
+	s.WriteString(fmt.Sprintf("    Driver Extra: %d bytes\n", d.DriverExtra()))
+	s.WriteString(prepend("    ", d.Fields().String()))
 	s.WriteString(fmt.Sprintf("    Orientation: %d\n", d.Orientation()))
 	s.WriteString(fmt.Sprintf("    Paper Size: %d\n", d.PaperSize()))
 	s.WriteString(fmt.Sprintf("    Paper Length: %d\n", d.PaperLength()))
@@ -243,5 +243,103 @@ func (d *devMode) String() string {
 	s.WriteString(fmt.Sprintf("    ICM Intent: %d\n", d.ICMIntent()))
 	s.WriteString(fmt.Sprintf("    Media Type: %d\n", d.MediaType()))
 	s.WriteString(fmt.Sprintf("    Dither Type: %d\n", d.DitherType()))
+	return s.String()
+}
+
+type devModeFields uint32
+
+func (f devModeFields) String() string {
+	var s strings.Builder
+	s.WriteString("Fields:\n")
+	if f&C.DM_ORIENTATION != 0 {
+		s.WriteString("    DM_ORIENTATION\n")
+	}
+	if f&C.DM_PAPERSIZE != 0 {
+		s.WriteString("    DM_PAPERSIZE\n")
+	}
+	if f&C.DM_PAPERLENGTH != 0 {
+		s.WriteString("    DM_PAPERLENGTH\n")
+	}
+	if f&C.DM_PAPERWIDTH != 0 {
+		s.WriteString("    DM_PAPERWIDTH\n")
+	}
+	if f&C.DM_SCALE != 0 {
+		s.WriteString("    DM_SCALE\n")
+	}
+	if f&C.DM_POSITION != 0 {
+		s.WriteString("    DM_POSITION\n")
+	}
+	if f&C.DM_NUP != 0 {
+		s.WriteString("    DM_NUP\n")
+	}
+	if f&C.DM_DISPLAYORIENTATION != 0 {
+		s.WriteString("    DM_DISPLAYORIENTATION\n")
+	}
+	if f&C.DM_COPIES != 0 {
+		s.WriteString("    DM_COPIES\n")
+	}
+	if f&C.DM_DEFAULTSOURCE != 0 {
+		s.WriteString("    DM_DEFAULTSOURCE\n")
+	}
+	if f&C.DM_PRINTQUALITY != 0 {
+		s.WriteString("    DM_PRINTQUALITY\n")
+	}
+	if f&C.DM_COLOR != 0 {
+		s.WriteString("    DM_COLOR\n")
+	}
+	if f&C.DM_DUPLEX != 0 {
+		s.WriteString("    DM_DUPLEX\n")
+	}
+	if f&C.DM_YRESOLUTION != 0 {
+		s.WriteString("    DM_YRESOLUTION\n")
+	}
+	if f&C.DM_TTOPTION != 0 {
+		s.WriteString("    DM_TTOPTION\n")
+	}
+	if f&C.DM_COLLATE != 0 {
+		s.WriteString("    DM_COLLATE\n")
+	}
+	if f&C.DM_FORMNAME != 0 {
+		s.WriteString("    DM_FORMNAME\n")
+	}
+	if f&C.DM_LOGPIXELS != 0 {
+		s.WriteString("    DM_LOGPIXELS\n")
+	}
+	if f&C.DM_BITSPERPEL != 0 {
+		s.WriteString("    DM_BITSPERPEL\n")
+	}
+	if f&C.DM_PELSWIDTH != 0 {
+		s.WriteString("    DM_PELSWIDTH\n")
+	}
+	if f&C.DM_PELSHEIGHT != 0 {
+		s.WriteString("    DM_PELSHEIGHT\n")
+	}
+	if f&C.DM_DISPLAYFLAGS != 0 {
+		s.WriteString("    DM_DISPLAYFLAGS\n")
+	}
+	if f&C.DM_DISPLAYFREQUENCY != 0 {
+		s.WriteString("    DM_DISPLAYFREQUENCY\n")
+	}
+	if f&C.DM_ICMMETHOD != 0 {
+		s.WriteString("    DM_ICMMETHOD\n")
+	}
+	if f&C.DM_ICMINTENT != 0 {
+		s.WriteString("    DM_ICMINTENT\n")
+	}
+	if f&C.DM_MEDIATYPE != 0 {
+		s.WriteString("    DM_MEDIATYPE\n")
+	}
+	if f&C.DM_DITHERTYPE != 0 {
+		s.WriteString("    DM_DITHERTYPE\n")
+	}
+	if f&C.DM_PANNINGWIDTH != 0 {
+		s.WriteString("    DM_PANNINGWIDTH\n")
+	}
+	if f&C.DM_PANNINGHEIGHT != 0 {
+		s.WriteString("    DM_PANNINGHEIGHT\n")
+	}
+	if f&C.DM_DISPLAYFIXEDOUTPUT != 0 {
+		s.WriteString("    DM_DISPLAYFIXEDOUTPUT\n")
+	}
 	return s.String()
 }
