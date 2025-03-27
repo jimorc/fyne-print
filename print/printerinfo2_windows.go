@@ -16,36 +16,57 @@ type PrinterInfo2 C.PRINTER_INFO_2W
 
 // ServerName returns the printer server name.
 func (pi2 *PrinterInfo2) ServerName() string {
+	if pi2.pServerName == nil || *pi2.pServerName == 0 {
+		return "(none)"
+	}
 	return windows.UTF16PtrToString((*uint16)(unsafe.Pointer(pi2.pServerName)))
 }
 
 // PrinterName returns the printer name.
 func (pi2 *PrinterInfo2) PrinterName() string {
+	if pi2.pPrinterName == nil || *pi2.pPrinterName == 0 {
+		return "(none)"
+	}
 	return windows.UTF16PtrToString((*uint16)(unsafe.Pointer(pi2.pPrinterName)))
 }
 
 // ShareName returns the printer's share name.
 func (pi2 *PrinterInfo2) ShareName() string {
+	if pi2.pShareName == nil || *pi2.pShareName == 0 {
+		return "(none)"
+	}
 	return windows.UTF16PtrToString((*uint16)(unsafe.Pointer(pi2.pShareName)))
 }
 
 // PortName returns the printer's port name.
 func (pi2 *PrinterInfo2) PortName() string {
+	if pi2.pPortName == nil || *pi2.pPortName == 0 {
+		return "(none)"
+	}
 	return windows.UTF16PtrToString((*uint16)(unsafe.Pointer(pi2.pPortName)))
 }
 
 // DriverName returns the printer's driver name.
 func (pi2 *PrinterInfo2) DriverName() string {
+	if pi2.pDriverName == nil || *pi2.pDriverName == 0 {
+		return "(none)"
+	}
 	return windows.UTF16PtrToString((*uint16)(unsafe.Pointer(pi2.pDriverName)))
 }
 
 // Comment returns the comment associated with the printer.
 func (pi2 *PrinterInfo2) Comment() string {
+	if pi2.pComment == nil || *pi2.pComment == 0 {
+		return "(none)"
+	}
 	return windows.UTF16PtrToString((*uint16)(unsafe.Pointer(pi2.pComment)))
 }
 
 // Location returns the printer's location as set during its configuration.
 func (pi2 *PrinterInfo2) Location() string {
+	if pi2.pLocation == nil || *pi2.pLocation == 0 {
+		return "(none)"
+	}
 	return windows.UTF16PtrToString((*uint16)(unsafe.Pointer(pi2.pLocation)))
 }
 
@@ -57,11 +78,16 @@ func (pi2 *PrinterInfo2) DevMode() *devMode {
 // SepFile returns the name of the file used to create the separator page.
 // This page separates print jobs sent to the printer.
 func (pi2 *PrinterInfo2) SepFile() string {
+	if pi2.pSepFile == nil || *pi2.pSepFile == 0 {
+	}
 	return windows.UTF16PtrToString((*uint16)(unsafe.Pointer(pi2.pSepFile)))
 }
 
 // PrintProcessor returns the name of the print processor used by the printer.
 func (pi2 *PrinterInfo2) PrintProcessor() string {
+	if pi2.pPrintProcessor == nil || *pi2.pPrintProcessor == 0 {
+		return "(none)"
+	}
 	return windows.UTF16PtrToString((*uint16)(unsafe.Pointer(pi2.pPrintProcessor)))
 }
 
@@ -69,11 +95,17 @@ func (pi2 *PrinterInfo2) PrintProcessor() string {
 // the EnumPrintProcessorDatatypes function to obtain a list of data types supported
 // by a specific print processor.
 func (pi2 PrinterInfo2) Datatype() string {
+	if pi2.pDatatype == nil || *pi2.pDatatype == 0 {
+		return "(none)"
+	}
 	return windows.UTF16PtrToString((*uint16)(unsafe.Pointer(pi2.pDatatype)))
 }
 
 // Parameters returns the default print-processor parameters.
 func (pi2 *PrinterInfo2) Parameters() string {
+	if pi2.pParameters == nil || *pi2.pParameters == 0 {
+		return "(none)"
+	}
 	return windows.UTF16PtrToString((*uint16)(unsafe.Pointer(pi2.pParameters)))
 }
 

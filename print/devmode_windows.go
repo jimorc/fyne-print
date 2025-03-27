@@ -19,6 +19,9 @@ type devMode C.DEVMODEW
 
 // DeviceName returns the printer's device name.
 func (d *devMode) DeviceName() string {
+	if d.dmDeviceName[0] == 0 {
+		return "(none)"
+	}
 	return windows.UTF16PtrToString((*uint16)(unsafe.Pointer(&d.dmDeviceName[0])))
 }
 
@@ -56,7 +59,7 @@ func (d *devMode) Fields() devModeFields {
 // C.DMORIENTPORTRAIT and C.DMORIENT_LANDSCAPE.
 func (d *devMode) Orientation() uint16 {
 	p := unsafe.Pointer(&d.anon0[0])
-	pSlice := (*[1 << 30]uint16)(p)[0:2]
+	pSlice := (*[unsafe.Sizeof(d.anon0)]uint16)(p)[0:2]
 	return pSlice[0]
 }
 
@@ -65,7 +68,7 @@ func (d *devMode) Orientation() uint16 {
 // is specified by the PaperLength and PaperWidth methods.
 func (d *devMode) PaperSize() uint16 {
 	p := unsafe.Pointer(&d.anon0[0])
-	pSlice := (*[1 << 30]uint16)(p)[2:4]
+	pSlice := (*[unsafe.Sizeof(d.anon0)]uint16)(p)[2:4]
 	return pSlice[0]
 }
 
@@ -73,7 +76,7 @@ func (d *devMode) PaperSize() uint16 {
 // value is valid only if PaperSize return 0.
 func (d *devMode) PaperLength() uint16 {
 	p := unsafe.Pointer(&d.anon0[0])
-	pSlice := (*[1 << 30]uint16)(p)[4:6]
+	pSlice := (*[unsafe.Sizeof(d.anon0)]uint16)(p)[4:6]
 	return pSlice[0]
 }
 
@@ -81,7 +84,7 @@ func (d *devMode) PaperLength() uint16 {
 // value is valid only if PaperSize return 0.
 func (d *devMode) PaperWidth() uint16 {
 	p := unsafe.Pointer(&d.anon0[0])
-	pSlice := (*[1 << 30]uint16)(p)[6:8]
+	pSlice := (*[unsafe.Sizeof(d.anon0)]uint16)(p)[6:8]
 	return pSlice[0]
 }
 
@@ -89,7 +92,7 @@ func (d *devMode) PaperWidth() uint16 {
 // The image's media size is scaled to the physical page by the factor of Scale()/100.
 func (d *devMode) Scale() uint16 {
 	p := unsafe.Pointer(&d.anon0[0])
-	pSlice := (*[1 << 30]uint16)(p)[8:10]
+	pSlice := (*[unsafe.Sizeof(d.anon0)]uint16)(p)[8:10]
 	return pSlice[0]
 }
 
@@ -97,7 +100,7 @@ func (d *devMode) Scale() uint16 {
 // multiple copies
 func (d *devMode) Copies() uint16 {
 	p := unsafe.Pointer(&d.anon0[0])
-	pSlice := (*[1 << 30]uint16)(p)[10:12]
+	pSlice := (*[unsafe.Sizeof(d.anon0)]uint16)(p)[10:12]
 	return pSlice[0]
 }
 
@@ -106,7 +109,7 @@ func (d *devMode) Copies() uint16 {
 // is DMBIN_FORMSOURCE, the input bin should be selected automatically.
 func (d *devMode) DefaultSource() uint16 {
 	p := unsafe.Pointer(&d.anon0[0])
-	pSlice := (*[1 << 30]uint16)(p)[12:14]
+	pSlice := (*[unsafe.Sizeof(d.anon0)]uint16)(p)[12:14]
 	return pSlice[0]
 }
 
@@ -121,7 +124,7 @@ func (d *devMode) DefaultSource() uint16 {
 // for the x resolution, and the y resolution is specified by YResolution.
 func (d *devMode) PrintQuality() uint16 {
 	p := unsafe.Pointer(&d.anon0[0])
-	pSlice := (*[1 << 30]uint16)(p)[14:16]
+	pSlice := (*[unsafe.Sizeof(d.anon0)]uint16)(p)[14:16]
 	return pSlice[0]
 }
 
@@ -158,6 +161,9 @@ func (d *devMode) Collate() uint16 {
 // FormName returns the name of the form (media size) to use. This is a name
 // that is returned by the Printer.EnumForms method.
 func (d *devMode) FormName() string {
+	if d.dmFormName[0] == 0 {
+		return "(none)"
+	}
 	return windows.UTF16PtrToString((*uint16)(unsafe.Pointer(&d.dmFormName[0])))
 }
 
