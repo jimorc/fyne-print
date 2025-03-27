@@ -217,7 +217,7 @@ func (d *devMode) DitherType() uint32 {
 
 func (d *devMode) String() string {
 	var s strings.Builder
-	s.WriteString("DevMode:")
+	s.WriteString("DevMode:\n")
 	s.WriteString(fmt.Sprintf("    Device Name: %s\n", d.DeviceName()))
 	s.WriteString(fmt.Sprintf("    Spec Version: %d\n", d.SpecVersion()))
 	s.WriteString(fmt.Sprintf("    Driver Version: %d\n", d.DriverVersion()))

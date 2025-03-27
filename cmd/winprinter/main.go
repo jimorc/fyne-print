@@ -8,7 +8,8 @@ import (
 
 func main() {
 	p := print.NewPrinters()
-	for _, pr := range *p {
-		fmt.Println(pr)
+	for i, pr := range *p {
+		fmt.Printf("Printer %d:\n", i)
+		fmt.Println(pr.String())
 	}
 }

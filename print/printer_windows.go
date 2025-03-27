@@ -3,7 +3,11 @@ package print
 //#define UNICODE
 //#include "windows.h"
 import "C"
-import "syscall"
+import (
+	"fmt"
+	"strings"
+	"syscall"
+)
 
 // Printer is a struct that allows access to a printer.
 type Printer struct {
@@ -20,4 +24,12 @@ func newPrinter(pInfo2 *PrinterInfo2) *Printer {
 	prHandle := openPrinter(p.pi2.PrinterName(), printerDefs)
 	p.handle = prHandle
 	return p
+}
+
+// String returns a string representation of the Printer struct.
+func (pr *Printer) String() string {
+	var s strings.Builder
+	s.WriteString(fmt.Sprintf("    Handle: %d\n", pr.handle))
+	s.WriteString(prepend("    ", pr.pi2.String()))
+	return s.String()
 }

@@ -107,7 +107,7 @@ func (pi2 *PrinterInfo2) DefPriority() uint32 {
 // a job. The format is (hour):(minute).
 func (pi2 *PrinterInfo2) PrinterStartTime() string {
 	start := uint32(pi2.StartTime)
-	s := fmt.Sprintf("%d:%d", start/60, start%60)
+	s := fmt.Sprintf("%d:%02d", start/60, start%60)
 	return s
 }
 
@@ -115,7 +115,7 @@ func (pi2 *PrinterInfo2) PrinterStartTime() string {
 // a job. The format is (hour):(minute).
 func (pi2 *PrinterInfo2) PrinterUntilTime() string {
 	until := uint32(pi2.UntilTime)
-	s := fmt.Sprintf("%d:%d", until/60, until%60)
+	s := fmt.Sprintf("%d:%02d", until/60, until%60)
 	return s
 }
 
