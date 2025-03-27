@@ -59,17 +59,17 @@ func (d *devMode) Fields() devModeFields {
 // C.DMORIENTPORTRAIT and C.DMORIENT_LANDSCAPE.
 func (d *devMode) Orientation() orientation {
 	p := unsafe.Pointer(&d.anon0[0])
-	pSlice := (*[unsafe.Sizeof(d.anon0)]uint16)(p)[0:2]
+	pSlice := (*[unsafe.Sizeof(d.anon0) / 2]uint16)(p)[0:1]
 	return orientation(pSlice[0])
 }
 
 // PaperSize returns the printer's media size as one of the DMPAPER_xxx
 // values defined in wingdi.h. If PaperSize returns 0, then the media size
 // is specified by the PaperLength and PaperWidth methods.
-func (d *devMode) PaperSize() uint16 {
+func (d *devMode) PaperSize() paperSize {
 	p := unsafe.Pointer(&d.anon0[0])
-	pSlice := (*[unsafe.Sizeof(d.anon0)]uint16)(p)[2:4]
-	return pSlice[0]
+	pSlice := (*[unsafe.Sizeof(d.anon0) / 2]uint16)(p)[1:2]
+	return paperSize(pSlice[0])
 }
 
 // PaperLength returns the printer's media size length in 1/10ths of a mm. This
@@ -235,7 +235,7 @@ func (d *devMode) String() string {
 		s.WriteString(fmt.Sprintf("    Orientation: %s\n", d.Orientation().String()))
 	}
 	if f.paperSizeSet() {
-		s.WriteString(fmt.Sprintf("    Paper Size: %d\n", d.PaperSize()))
+		s.WriteString(fmt.Sprintf("    Paper Size: %s\n", d.PaperSize().String()))
 	}
 	if f.paperLengthSet() {
 		s.WriteString(fmt.Sprintf("    Paper Length: %d\n", d.PaperLength()))
@@ -541,7 +541,7 @@ func (f devModeFields) String() string {
 	return s.String()
 }
 
-// rientation is the dmPrientation field from the devMode struct.
+// orientation is the dmPrientation field from the devMode struct.
 type orientation uint16
 
 // String outputs the paper orientation.
@@ -553,5 +553,243 @@ func (o orientation) String() string {
 		return "DMORIENT_LANDSCAPE"
 	default:
 		return fmt.Sprintf("Unknown orientation: %d", o)
+	}
+}
+
+// paperSize is the dmPaperSize field from the devMode struct.
+type paperSize uint16
+
+// String outputs the paper size.
+func (p paperSize) String() string {
+	switch p {
+	case C.DMPAPER_LETTER:
+		return "DMPAPER_LETTER"
+	case C.DMPAPER_LETTERSMALL:
+		return "DMPAPER_LETTERSMALL"
+	case C.DMPAPER_TABLOID:
+		return "DMPAPER_TABLOID"
+	case C.DMPAPER_LEDGER:
+		return "DMPAPER_LEDGER"
+	case C.DMPAPER_LEGAL:
+		return "DMPAPER_LEGAL"
+	case C.DMPAPER_STATEMENT:
+		return "DMPAPER_STATEMENT"
+	case C.DMPAPER_EXECUTIVE:
+		return "DMPAPER_EXECUTIVE"
+	case C.DMPAPER_A3:
+		return "DMPAPER_A3"
+	case C.DMPAPER_A4:
+		return "DMPAPER_A4"
+	case C.DMPAPER_A4SMALL:
+		return "DMPAPER_A4SMALL"
+	case C.DMPAPER_A5:
+		return "DMPAPER_A5"
+	case C.DMPAPER_B4:
+		return "DMPAPER_B4"
+	case C.DMPAPER_B5:
+		return "DMPAPER_B5"
+	case C.DMPAPER_FOLIO:
+		return "DMPAPER_FOLIO"
+	case C.DMPAPER_QUARTO:
+		return "DMPAPER_QUARTO"
+	case C.DMPAPER_10X14:
+		return "DMPAPER_10X14"
+	case C.DMPAPER_11X17:
+		return "DMPAPER_11X17"
+	case C.DMPAPER_NOTE:
+		return "DMPAPER_NOTE"
+	case C.DMPAPER_ENV_9:
+		return "DMPAPER_ENV_9"
+	case C.DMPAPER_ENV_10:
+		return "DMPAPER_ENV_10"
+	case C.DMPAPER_ENV_11:
+		return "DMPAPER_ENV_11"
+	case C.DMPAPER_ENV_12:
+		return "DMPAPER_ENV_12"
+	case C.DMPAPER_ENV_14:
+		return "DMPAPER_ENV_14"
+	case C.DMPAPER_CSHEET:
+		return "DMPAPER_CSHEET"
+	case C.DMPAPER_DSHEET:
+		return "DMPAPER_DSHEET"
+	case C.DMPAPER_ESHEET:
+		return "DMPAPER_ESHEET"
+	case C.DMPAPER_ENV_DL:
+		return "DMPAPER_ENV_DL"
+	case C.DMPAPER_ENV_C5:
+		return "DMPAPER_ENV_C5"
+	case C.DMPAPER_ENV_C3:
+		return "DMPAPER_ENV_C3"
+	case C.DMPAPER_ENV_C4:
+		return "DMPAPER_ENV_C4"
+	case C.DMPAPER_ENV_C6:
+		return "DMPAPER_ENV_C6"
+	case C.DMPAPER_ENV_C65:
+		return "DMPAPER_ENV_C65"
+	case C.DMPAPER_ENV_B4:
+		return "DMPAPER_ENV_B4"
+	case C.DMPAPER_ENV_B5:
+		return "DMPAPER_ENV_B5"
+	case C.DMPAPER_ENV_ITALY:
+		return "DMPAPER_ENV_ITALY"
+	case C.DMPAPER_ENV_MONARCH:
+		return "DMPAPER_ENV_MONARCH"
+	case C.DMPAPER_ENV_PERSONAL:
+		return "DMPAPER_ENV_PERSONAL"
+	case C.DMPAPER_FANFOLD_US:
+		return "DMPAPER_FANFOLD_US"
+	case C.DMPAPER_FANFOLD_STD_GERMAN:
+		return "DMPAPER_FANFOLD_STD_GERMAN"
+	case C.DMPAPER_FANFOLD_LGL_GERMAN:
+		return "DMPAPER_FANFOLD_LGL_GERMAN"
+	case C.DMPAPER_ISO_B4:
+		return "DMPAPER_ISO_B4"
+	case C.DMPAPER_JAPANESE_POSTCARD:
+		return "DMPAPER_JAPANESE_POSTCARD"
+	case C.DMPAPER_9X11:
+		return "DMPAPER_9X11"
+	case C.DMPAPER_10X11:
+		return "DMPAPER_10X11"
+	case C.DMPAPER_15X11:
+		return "DMPAPER_15X11"
+	case C.DMPAPER_ENV_INVITE:
+		return "DMPAPER_ENV_INVITE"
+	case C.DMPAPER_RESERVED_48:
+		return "DMPAPER_RESERVED_48"
+	case C.DMPAPER_RESERVED_49:
+		return "DMPAPER_RESERVED_49"
+	case C.DMPAPER_LETTER_EXTRA:
+		return "DMPAPER_LETTER_EXTRA"
+	case C.DMPAPER_LEGAL_EXTRA:
+		return "DMPAPER_LEGAL_EXTRA"
+	case C.DMPAPER_TABLOID_EXTRA:
+		return "DMPAPER_TABLOID_EXTRA"
+	case C.DMPAPER_A4_EXTRA:
+		return "DMPAPER_A4_EXTRA"
+	case C.DMPAPER_LETTER_TRANSVERSE:
+		return "DMPAPER_LETTER_TRANSVERSE"
+	case C.DMPAPER_A4_TRANSVERSE:
+		return "DMPAPER_A4_TRANSVERSE"
+	case C.DMPAPER_LETTER_EXTRA_TRANSVERSE:
+		return "DMPAPER_LETTER_EXTRA_TRANSVERSE"
+	case C.DMPAPER_A_PLUS:
+		return "DMPAPER_A_PLUS"
+	case C.DMPAPER_B_PLUS:
+		return "DMPAPER_B_PLUS"
+	case C.DMPAPER_LETTER_PLUS:
+		return "DMPAPER_LETTER_PLUS"
+	case C.DMPAPER_A4_PLUS:
+		return "DMPAPER_A4_PLUS"
+	case C.DMPAPER_A5_TRANSVERSE:
+		return "DMPAPER_A5_TRANSVERSE"
+	case C.DMPAPER_B5_TRANSVERSE:
+		return "DMPAPER_B5_TRANSVERSE"
+	case C.DMPAPER_A3_EXTRA:
+		return "DMPAPER_A3_EXTRA"
+	case C.DMPAPER_DBL_JAPANESE_POSTCARD:
+		return "DMPAPER_DBL_JAPANESE_POSTCARD"
+	case C.DMPAPER_A6:
+		return "DMPAPER_A6"
+	case C.DMPAPER_JENV_KAKU2:
+		return "DMPAPER_JENV_KAKU2"
+	case C.DMPAPER_JENV_KAKU3:
+		return "DMPAPER_JENV_KAKU3"
+	case C.DMPAPER_JENV_CHOU3:
+		return "DMPAPER_JENV_CHOU3"
+	case C.DMPAPER_JENV_CHOU4:
+		return "DMPAPER_JENV_CHOU4"
+	case C.DMPAPER_LETTER_ROTATED:
+		return "DMPAPER_LETTER_ROTATED"
+	case C.DMPAPER_A3_ROTATED:
+		return "DMPAPER_A3_ROTATED"
+	case C.DMPAPER_A4_ROTATED:
+		return "DMPAPER_A4_ROTATED"
+	case C.DMPAPER_A5_ROTATED:
+		return "DMPAPER_A5_ROTATED"
+	case C.DMPAPER_B4_JIS_ROTATED:
+		return "DMPAPER_B4_JIS_ROTATED"
+	case C.DMPAPER_B5_JIS_ROTATED:
+		return "DMPAPER_B5_JIS_ROTATED"
+	case C.DMPAPER_JAPANESE_POSTCARD_ROTATED:
+		return "DMPAPER_JAPANESE_POSTCARD_ROTATED"
+	case C.DMPAPER_DBL_JAPANESE_POSTCARD_ROTATED:
+		return "DMPAPER_DBL_JAPANESE_POSTCARD_ROTATED"
+	case C.DMPAPER_A6_ROTATED:
+		return "DMPAPER_A6_ROTATED"
+	case C.DMPAPER_JENV_KAKU2_ROTATED:
+		return "DMPAPER_JENV_KAKU2_ROTATED"
+	case C.DMPAPER_JENV_KAKU3_ROTATED:
+		return "DMPAPER_JENV_KAKU3_ROTATED"
+	case C.DMPAPER_JENV_CHOU3_ROTATED:
+		return "DMPAPER_JENV_CHOU3_ROTATED"
+	case C.DMPAPER_JENV_CHOU4_ROTATED:
+		return "DMPAPER_JENV_CHOU4_ROTATED"
+	case C.DMPAPER_B6_JIS:
+		return "DMPAPER_B6_JIS"
+	case C.DMPAPER_B6_JIS_ROTATED:
+		return "DMPAPER_B6_JIS_ROTATED"
+	case C.DMPAPER_12X11:
+		return "DMPAPER_12X11"
+	case C.DMPAPER_JENV_YOU4:
+		return "DMPAPER_JENV_YOU4"
+	case C.DMPAPER_JENV_YOU4_ROTATED:
+		return "DMPAPER_JENV_YOU4_ROTATED"
+	case C.DMPAPER_P16K:
+		return "DMPAPER_P16K"
+	case C.DMPAPER_P32K:
+		return "DMPAPER_P32K"
+	case C.DMPAPER_P32KBIG:
+		return "DMPAPER_P32KBIG"
+	case C.DMPAPER_PENV_1:
+		return "DMPAPER_PENV_1"
+	case C.DMPAPER_PENV_2:
+		return "DMPAPER_PENV_2"
+	case C.DMPAPER_PENV_3:
+		return "DMPAPER_PENV_3"
+	case C.DMPAPER_PENV_4:
+		return "DMPAPER_PENV_4"
+	case C.DMPAPER_PENV_5:
+		return "DMPAPER_PENV_5"
+	case C.DMPAPER_PENV_6:
+		return "DMPAPER_PENV_6"
+	case C.DMPAPER_PENV_7:
+		return "DMPAPER_PENV_7"
+	case C.DMPAPER_PENV_8:
+		return "DMPAPER_PENV_8"
+	case C.DMPAPER_PENV_9:
+		return "DMPAPER_PENV_9"
+	case C.DMPAPER_PENV_10:
+		return "DMPAPER_PENV_10"
+	case C.DMPAPER_P16K_ROTATED:
+		return "DMPAPER_P16K_ROTATED"
+	case C.DMPAPER_P32K_ROTATED:
+		return "DMPAPER_P32K_ROTATED"
+	case C.DMPAPER_P32KBIG_ROTATED:
+		return "DMPAPER_P32KBIG_ROTATED"
+	case C.DMPAPER_PENV_1_ROTATED:
+		return "DMPAPER_PENV_1_ROTATED"
+	case C.DMPAPER_PENV_2_ROTATED:
+		return "DMPAPER_PENV_2_ROTATED"
+	case C.DMPAPER_PENV_3_ROTATED:
+		return "DMPAPER_PENV_3_ROTATED"
+	case C.DMPAPER_PENV_4_ROTATED:
+		return "DMPAPER_PENV_4_ROTATED"
+	case C.DMPAPER_PENV_5_ROTATED:
+		return "DMPAPER_PENV_5_ROTATED"
+	case C.DMPAPER_PENV_6_ROTATED:
+		return "DMPAPER_PENV_6_ROTATED"
+	case C.DMPAPER_PENV_7_ROTATED:
+		return "DMPAPER_PENV_7_ROTATED"
+	case C.DMPAPER_PENV_8_ROTATED:
+		return "DMPAPER_PENV_8_ROTATED"
+	case C.DMPAPER_PENV_9_ROTATED:
+		return "DMPAPER_PENV_9_ROTATED"
+	case C.DMPAPER_PENV_10_ROTATED:
+		return "DMPAPER_PENV_10_ROTATED"
+	default:
+		if p >= C.DMPAPER_USER {
+			return "DMPAPER_USER Defined"
+		}
+		return fmt.Sprintf("Unknown paper size: %d", p)
 	}
 }
