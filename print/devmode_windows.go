@@ -217,6 +217,7 @@ func (d *devMode) DitherType() uint32 {
 
 func (d *devMode) String() string {
 	var s strings.Builder
+	f := d.Fields()
 	s.WriteString("DevMode:\n")
 	s.WriteString(fmt.Sprintf("    Device Name: %s\n", d.DeviceName()))
 	s.WriteString(fmt.Sprintf("    Spec Version: %d\n", d.SpecVersion()))
@@ -224,40 +225,230 @@ func (d *devMode) String() string {
 	s.WriteString(fmt.Sprintf("    Size: %d bytes\n", d.Size()))
 	s.WriteString(fmt.Sprintf("    Driver Extra: %d bytes\n", d.DriverExtra()))
 	s.WriteString(prepend("    ", d.Fields().String()))
-	s.WriteString(fmt.Sprintf("    Orientation: %d\n", d.Orientation()))
-	s.WriteString(fmt.Sprintf("    Paper Size: %d\n", d.PaperSize()))
-	s.WriteString(fmt.Sprintf("    Paper Length: %d\n", d.PaperLength()))
-	s.WriteString(fmt.Sprintf("    Paper Width: %d\n", d.PaperWidth()))
-	s.WriteString(fmt.Sprintf("    Scale: %d\n", d.Scale()))
-	s.WriteString(fmt.Sprintf("    Copies: %d\n", d.Copies()))
-	s.WriteString(fmt.Sprintf("    Default Source: %d\n", d.DefaultSource()))
-	s.WriteString(fmt.Sprintf("    Print Quality: %d\n", d.PrintQuality()))
-	s.WriteString(fmt.Sprintf("    Color: %d\n", d.Color()))
-	s.WriteString(fmt.Sprintf("    Duplex: %d\n", d.Duplex()))
-	s.WriteString(fmt.Sprintf("    Y Resolution: %d\n", d.YResolution()))
-	s.WriteString(fmt.Sprintf("    TT Option: %d\n", d.TTOption()))
-	s.WriteString(fmt.Sprintf("    Collate: %d\n", d.Collate()))
-	s.WriteString(fmt.Sprintf("    Form Name: %s\n", d.FormName()))
-	s.WriteString(fmt.Sprintf("    Nup: %d\n", d.Nup()))
-	s.WriteString(fmt.Sprintf("    ICM Method: %d\n", d.ICMMethod()))
-	s.WriteString(fmt.Sprintf("    ICM Intent: %d\n", d.ICMIntent()))
-	s.WriteString(fmt.Sprintf("    Media Type: %d\n", d.MediaType()))
-	s.WriteString(fmt.Sprintf("    Dither Type: %d\n", d.DitherType()))
+	if f.orientationSet() {
+		s.WriteString(fmt.Sprintf("    Orientation: %d\n", d.Orientation()))
+	}
+	if f.paperSizeSet() {
+		s.WriteString(fmt.Sprintf("    Paper Size: %d\n", d.PaperSize()))
+	}
+	if f.paperLengthSet() {
+		s.WriteString(fmt.Sprintf("    Paper Length: %d\n", d.PaperLength()))
+	}
+	if f.paperWidthSet() {
+		s.WriteString(fmt.Sprintf("    Paper Width: %d\n", d.PaperWidth()))
+	}
+	if f.scaleSet() {
+		s.WriteString(fmt.Sprintf("    Scale: %d\n", d.Scale()))
+	}
+	if f.copiesSet() {
+		s.WriteString(fmt.Sprintf("    Copies: %d\n", d.Copies()))
+	}
+	if f.defaultSourceSet() {
+		s.WriteString(fmt.Sprintf("    Default Source: %d\n", d.DefaultSource()))
+	}
+	if f.printQualitySet() {
+		s.WriteString(fmt.Sprintf("    Print Quality: %d\n", d.PrintQuality()))
+	}
+	if f.colorSet() {
+		s.WriteString(fmt.Sprintf("    Color: %d\n", d.Color()))
+	}
+	if f.duplexSet() {
+		s.WriteString(fmt.Sprintf("    Duplex: %d\n", d.Duplex()))
+	}
+	if f.yResolutionSet() {
+		s.WriteString(fmt.Sprintf("    Y Resolution: %d\n", d.YResolution()))
+	}
+	if f.ttOptionSet() {
+		s.WriteString(fmt.Sprintf("    TT Option: %d\n", d.TTOption()))
+	}
+	if f.collateSet() {
+		s.WriteString(fmt.Sprintf("    Collate: %d\n", d.Collate()))
+	}
+	if f.formNameSet() {
+		s.WriteString(fmt.Sprintf("    Form Name: %s\n", d.FormName()))
+	}
+	if f.nupSet() {
+		s.WriteString(fmt.Sprintf("    Nup: %d\n", d.Nup()))
+	}
+	if f.icmMethodSet() {
+		s.WriteString(fmt.Sprintf("    ICM Method: %d\n", d.ICMMethod()))
+	}
+	if f.icmIntentSet() {
+		s.WriteString(fmt.Sprintf("    ICM Intent: %d\n", d.ICMIntent()))
+	}
+	if f.mediaTypeSet() {
+		s.WriteString(fmt.Sprintf("    Media Type: %d\n", d.MediaType()))
+	}
+	if f.ditherTypeSet() {
+		s.WriteString(fmt.Sprintf("    Dither Type: %d\n", d.DitherType()))
+	}
 	return s.String()
 }
 
+// devModeFields is the Fields value from the devMode object.
 type devModeFields uint32
 
+// orientationSet returns true if the DM_ORIENTATION bit is set.
+func (f devModeFields) orientationSet() bool {
+	return f&C.DM_ORIENTATION != 0
+}
+
+// paperSizeSet returns true if the DM_PAPERSIZE bit is set.
+func (f devModeFields) paperSizeSet() bool {
+	return f&C.DM_PAPERSIZE != 0
+}
+
+// paperLengthSet returns true if the DM_PAPERLENGTH bit is set.
+func (f devModeFields) paperLengthSet() bool {
+	return f&C.DM_PAPERLENGTH != 0
+}
+
+// paperWidthSet returns true if the DM_PAPERWIDTH bit is set.
+func (f devModeFields) paperWidthSet() bool {
+	return f&C.DM_PAPERWIDTH != 0
+}
+
+// scaleSet returns true if the DM_SCALE bit is set.
+func (f devModeFields) scaleSet() bool {
+	return f&C.DM_SCALE != 0
+}
+
+// positionSet returns true if the DM_POSITION bit is set.
+func (f devModeFields) positionSet() bool {
+	return f&C.DM_POSITION != 0
+}
+
+// nupSet returns true if the DM_NUP bit is set.
+func (f devModeFields) nupSet() bool {
+	return f&C.DM_NUP != 0
+}
+
+// displayOrientationSet returns true if the DM_DISPLAYORIENTATION bit is set.
+func (f devModeFields) displayOrientationSet() bool {
+	return f&C.DM_DISPLAYORIENTATION != 0
+}
+
+// copiesSet returns true if the DM_COPIES bit is set.
+func (f devModeFields) copiesSet() bool {
+	return f&C.DM_COPIES != 0
+}
+
+// defaultSourceSet returns true if the DM_DEFAULTSOURCE bit is set.
+func (f devModeFields) defaultSourceSet() bool {
+	return f&C.DM_DEFAULTSOURCE != 0
+}
+
+// printQualitySet returns true if the DM_PRINTQUALITY bit is set.
+func (f devModeFields) printQualitySet() bool {
+	return f&C.DM_PRINTQUALITY != 0
+}
+
+// colorSet returns true if the DM_COLOR bit is set.
+func (f devModeFields) colorSet() bool {
+	return f&C.DM_COLOR != 0
+}
+
+// duplexSet returns true if the DM_DUPLEX bit is set.
+func (f devModeFields) duplexSet() bool {
+	return f&C.DM_DUPLEX != 0
+}
+
+// yResolutionSet returns true if the DM_YRESOLUTION but is set.
+func (f devModeFields) yResolutionSet() bool {
+	return f&C.DM_YRESOLUTION != 0
+}
+
+// ttOptionSet returns true if the DM_TTOPTION bit is set.
+func (f devModeFields) ttOptionSet() bool {
+	return f&C.DM_TTOPTION != 0
+}
+
+// collateSet returns true if the DM_COLLATE bit is set.
+func (f devModeFields) collateSet() bool {
+	return f&C.DM_COLLATE != 0
+}
+
+// formNameSet returns true if the DM_FORMNAME bit is set.
+func (f devModeFields) formNameSet() bool {
+	return f&C.DM_FORMNAME != 0
+}
+
+// logPixelsSet returns true if the DM_LOGPIXELS bit is set.
+func (f devModeFields) logPixelsSet() bool {
+	return f&C.DM_LOGPIXELS != 0
+}
+
+// bitsPerPixelSet returns true if the DM_BITSPERPEL bit is set.
+func (f devModeFields) bitsPerPixelSet() bool {
+	return f&C.DM_BITSPERPEL != 0
+}
+
+// pelWidthSet returns true if the DM_PELSWIDTH bit is set.
+func (f devModeFields) pelWidthSet() bool {
+	return f&C.DM_PELSWIDTH != 0
+}
+
+// pelHeightSet returns true if the DM_PELSHEIGHT bit is set.
+func (f devModeFields) pelHeightSet() bool {
+	return f&C.DM_PELSHEIGHT != 0
+}
+
+// displayFlagsSet returns true if the DM_DISPLAYFLAGS bit is set.
+func (f devModeFields) displayFlagsSet() bool {
+	return f&C.DM_DISPLAYFLAGS != 0
+}
+
+// displayFrequencySet returns true if the DM_DISPLAYFREQUENCY bit is set.
+func (f devModeFields) displayFrequencySet() bool {
+	return f&C.DM_DISPLAYFREQUENCY != 0
+}
+
+// icmMethodSet returns true if the DM_ICMMETHOD bit is set.
+func (f devModeFields) icmMethodSet() bool {
+	return f&C.DM_ICMMETHOD != 0
+}
+
+// icmIntentSet returns true if the DM_ICMINTENT bit is set.
+func (f devModeFields) icmIntentSet() bool {
+	return f&C.DM_ICMINTENT != 0
+}
+
+// mediaTypeSet returns true if the DM_MEDIATYPE bit is set.
+func (f devModeFields) mediaTypeSet() bool {
+	return f&C.DM_MEDIATYPE != 0
+}
+
+// ditherTypeSet returns true if the DM_DITHERTYPE bit is set.
+func (f devModeFields) ditherTypeSet() bool {
+	return f&C.DM_DITHERTYPE != 0
+}
+
+// panningWidthSet returns true if the DM_PANNINGWIDTH bit is set.
+func (f devModeFields) panningWidthSet() bool {
+	return f&C.DM_PANNINGWIDTH != 0
+}
+
+// panningHeightSet returns true if the DM_PANNINGHEIGHT bit is set.
+func (f devModeFields) panningHeightSet() bool {
+	return f&C.DM_PANNINGHEIGHT != 0
+}
+
+// displayFixedOutputSet returns true if the DM_DISPLAYFIXEDOUTPUT bit is set.
+func (f devModeFields) displayFixedOutputSet() bool {
+	return f&C.DM_DISPLAYFIXEDOUTPUT != 0
+}
+
+// String returns a string containing the devMode fields that are set.
 func (f devModeFields) String() string {
 	var s strings.Builder
 	s.WriteString("Fields:\n")
-	if f&C.DM_ORIENTATION != 0 {
+	if f.orientationSet() {
 		s.WriteString("    DM_ORIENTATION\n")
 	}
-	if f&C.DM_PAPERSIZE != 0 {
+	if f.paperSizeSet() {
 		s.WriteString("    DM_PAPERSIZE\n")
 	}
-	if f&C.DM_PAPERLENGTH != 0 {
+	if f.paperLengthSet() {
 		s.WriteString("    DM_PAPERLENGTH\n")
 	}
 	if f&C.DM_PAPERWIDTH != 0 {
