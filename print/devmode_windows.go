@@ -57,10 +57,10 @@ func (d *devMode) Fields() devModeFields {
 
 // Orientation returns the printer's paper orientation. Valid values are
 // C.DMORIENTPORTRAIT and C.DMORIENT_LANDSCAPE.
-func (d *devMode) Orientation() uint16 {
+func (d *devMode) Orientation() orientation {
 	p := unsafe.Pointer(&d.anon0[0])
 	pSlice := (*[unsafe.Sizeof(d.anon0)]uint16)(p)[0:2]
-	return pSlice[0]
+	return orientation(pSlice[0])
 }
 
 // PaperSize returns the printer's media size as one of the DMPAPER_xxx
@@ -232,7 +232,7 @@ func (d *devMode) String() string {
 	s.WriteString(fmt.Sprintf("    Driver Extra: %d bytes\n", d.DriverExtra()))
 	s.WriteString(prepend("    ", d.Fields().String()))
 	if f.orientationSet() {
-		s.WriteString(fmt.Sprintf("    Orientation: %d\n", d.Orientation()))
+		s.WriteString(fmt.Sprintf("    Orientation: %s\n", d.Orientation().String()))
 	}
 	if f.paperSizeSet() {
 		s.WriteString(fmt.Sprintf("    Paper Size: %d\n", d.PaperSize()))
@@ -291,7 +291,7 @@ func (d *devMode) String() string {
 	return s.String()
 }
 
-// devModeFields is the Fields value from the devMode object.
+// devModeFields is the dmFields value from the devMode object.
 type devModeFields uint32
 
 // orientationSet returns true if the DM_ORIENTATION bit is set.
@@ -539,4 +539,19 @@ func (f devModeFields) String() string {
 		s.WriteString("    DM_DISPLAYFIXEDOUTPUT\n")
 	}
 	return s.String()
+}
+
+// rientation is the dmPrientation field from the devMode struct.
+type orientation uint16
+
+// String outputs the paper orientation.
+func (o orientation) String() string {
+	switch o {
+	case C.DMORIENT_PORTRAIT:
+		return "DMORIENT_PORTRAIT"
+	case C.DMORIENT_LANDSCAPE:
+		return "DMORIENT_LANDSCAPE"
+	default:
+		return fmt.Sprintf("Unknown orientation: %d", o)
+	}
 }
