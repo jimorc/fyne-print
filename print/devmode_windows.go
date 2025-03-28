@@ -173,10 +173,10 @@ func (d *devMode) FormName() string {
 // DMNUP_SYSTEM: The print system handles N-up printing.
 // DMNUP_ONEUP: The print system does not handle "N-up" printing. An application can
 // set dmNup to DMNUP_ONEUP if it intends to carry out "N-up" printing on its own.
-func (d *devMode) Nup() uint32 {
+func (d *devMode) Nup() nup {
 	p := unsafe.Pointer(&d.anon1[0])
 	pSlice := (*[1 << 30]uint32)(p)[0:4]
-	return pSlice[0]
+	return nup(pSlice[0])
 }
 
 // ICMMethod specifies how ICM processing can.should be performed. Valid values and
@@ -275,7 +275,7 @@ func (d *devMode) String() string {
 		s.WriteString(fmt.Sprintf("    Form Name: %s\n", d.FormName()))
 	}
 	if f.nupSet() {
-		s.WriteString(fmt.Sprintf("    Nup: %d\n", d.Nup()))
+		s.WriteString(fmt.Sprintf("    Nup: %s\n", d.Nup().String()))
 	}
 	if f.icmMethodSet() {
 		s.WriteString(fmt.Sprintf("    ICM Method: %d\n", d.ICMMethod()))
@@ -922,6 +922,23 @@ func (c collate) String() string {
 		return "Don't Collate"
 	default:
 		err := fmt.Errorf("unknown collate value: %d", c)
+		fyne.LogError("Invalid DevMode setting: ", err)
+		return "Invalid value"
+	}
+}
+
+// nup specifies where N-up processing is done.
+type nup uint32
+
+// String returns the NUP value as a string.
+func (n nup) String() string {
+	switch n {
+	case C.DMNUP_SYSTEM:
+		return "Print spooler does"
+	case C.DMNUP_ONEUP:
+		return "Application does"
+	default:
+		err := fmt.Errorf("unknown nup value: %d", n)
 		fyne.LogError("Invalid DevMode setting: ", err)
 		return "Invalid value"
 	}
