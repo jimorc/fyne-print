@@ -122,10 +122,10 @@ func (d *devMode) DefaultSource() defaultSource {
 // DMRES_DRAFT
 // If a positive value is specified, it represents the number of dots per inch (DPI)
 // for the x resolution, and the y resolution is specified by YResolution.
-func (d *devMode) PrintQuality() uint16 {
+func (d *devMode) PrintQuality() printQuality {
 	p := unsafe.Pointer(&d.anon0[0])
-	pSlice := (*[unsafe.Sizeof(d.anon0)]uint16)(p)[7:8]
-	return pSlice[0]
+	pSlice := (*[unsafe.Sizeof(d.anon0)]int16)(p)[7:8]
+	return printQuality(pSlice[0])
 }
 
 // Color indicates whether a color printer should print in color or monochrome mode.
@@ -253,7 +253,7 @@ func (d *devMode) String() string {
 		s.WriteString(fmt.Sprintf("    Default Source: %s\n", d.DefaultSource().String()))
 	}
 	if f.printQualitySet() {
-		s.WriteString(fmt.Sprintf("    Print Quality: %d\n", d.PrintQuality()))
+		s.WriteString(fmt.Sprintf("    Print Quality: %s\n", d.PrintQuality().String()))
 	}
 	if f.colorSet() {
 		s.WriteString(fmt.Sprintf("    Color: %d\n", d.Color()))
@@ -826,5 +826,26 @@ func (d defaultSource) String() string {
 		return "DMBIN_FORMSOURCE"
 	default:
 		return fmt.Sprintf("Unknown: %d", d)
+	}
+}
+
+type printQuality int16
+
+func (p printQuality) String() string {
+	switch p {
+	case C.DMRES_DRAFT:
+		return "Draft"
+	case C.DMRES_LOW:
+		return "Low"
+	case C.DMRES_MEDIUM:
+		return "Medium"
+	case C.DMRES_HIGH:
+		return "High"
+	default:
+		if p > 0 {
+			return fmt.Sprintf("%d dpi", p)
+		} else {
+			return fmt.Sprintf("Unknown value: %d", p)
+		}
 	}
 }
