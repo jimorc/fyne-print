@@ -889,6 +889,7 @@ func (d duplex) String() string {
 	}
 }
 
+// ttOPtion defines how TrueType fonts should be printed.
 type ttOption int16
 
 // String returns the ttOption value as a string.
