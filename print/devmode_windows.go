@@ -883,7 +883,7 @@ func (d duplex) String() string {
 	case C.DMDUP_HORIZONTAL:
 		return "Short Edge Binding"
 	default:
-		err := fmt.Errorf("Unknown duplex value: %d", d)
+		err := fmt.Errorf("unknown duplex value: %d", d)
 		fyne.LogError("Invalid DevMode setting: ", err)
 		return "Invalid value"
 	}
