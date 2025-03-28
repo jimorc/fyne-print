@@ -794,8 +794,10 @@ func (p paperSize) String() string {
 	}
 }
 
+// defaultSource represents the default media source for the printer.
 type defaultSource uint16
 
+// String returns the default source as a string.
 func (d defaultSource) String() string {
 	switch d {
 	case C.DMBIN_UPPER:
@@ -829,8 +831,10 @@ func (d defaultSource) String() string {
 	}
 }
 
+// printQuality defines the print quality, either as set string or as dpi.
 type printQuality int16
 
+// String returns the print quality value as a string.
 func (p printQuality) String() string {
 	switch p {
 	case C.DMRES_DRAFT:
