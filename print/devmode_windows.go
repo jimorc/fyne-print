@@ -244,7 +244,7 @@ func (d *devMode) String() string {
 		s.WriteString(fmt.Sprintf("    Paper Width: %.1f mm\n", d.PaperWidth()))
 	}
 	if f.scaleSet() {
-		s.WriteString(fmt.Sprintf("    Scale: %d\n", d.Scale()))
+		s.WriteString(fmt.Sprintf("    Scale: %d%\n", d.Scale()))
 	}
 	if f.copiesSet() {
 		s.WriteString(fmt.Sprintf("    Copies: %d\n", d.Copies()))
