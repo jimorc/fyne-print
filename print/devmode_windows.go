@@ -155,8 +155,8 @@ func (d *devMode) TTOption() ttOption {
 
 // Collate indicates whether multiple prints should be collated. Valid values are
 // DMCOLLATE_TRUE and DM_COLLATE_FALSE.
-func (d *devMode) Collate() uint16 {
-	return uint16(d.dmCollate)
+func (d *devMode) Collate() collate {
+	return collate(d.dmCollate)
 }
 
 // FormName returns the name of the form (media size) to use. This is a name
@@ -269,7 +269,7 @@ func (d *devMode) String() string {
 		s.WriteString(fmt.Sprintf("    TT Option: %s\n", d.TTOption().String()))
 	}
 	if f.collateSet() {
-		s.WriteString(fmt.Sprintf("    Collate: %d\n", d.Collate()))
+		s.WriteString(fmt.Sprintf("    Collate: %s\n", d.Collate().String()))
 	}
 	if f.formNameSet() {
 		s.WriteString(fmt.Sprintf("    Form Name: %s\n", d.FormName()))
@@ -905,6 +905,23 @@ func (t ttOption) String() string {
 		return "Download as outline soft fonts"
 	default:
 		err := fmt.Errorf("unknown ttOption value: %d", t)
+		fyne.LogError("Invalid DevMode setting: ", err)
+		return "Invalid value"
+	}
+}
+
+// collatae defines whether collation should be used when printing multiple copies.
+type collate int16
+
+// String returns the collate value as a string.
+func (c collate) String() string {
+	switch c {
+	case C.DMCOLLATE_TRUE:
+		return "Collate"
+	case C.DMCOLLATE_FALSE:
+		return "Don't Collate"
+	default:
+		err := fmt.Errorf("unknown collate value: %d", c)
 		fyne.LogError("Invalid DevMode setting: ", err)
 		return "Invalid value"
 	}
