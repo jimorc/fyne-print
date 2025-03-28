@@ -149,8 +149,8 @@ func (d *devMode) YResolution() uint16 {
 
 // TTOPtion specifies how TrueType fonts should be printed. The returned value will be
 // one of the DMTT_ prefixed values defined in wingdi.h.
-func (d *devMode) TTOption() uint16 {
-	return uint16(d.dmTTOption)
+func (d *devMode) TTOption() ttOption {
+	return ttOption(d.dmTTOption)
 }
 
 // Collate indicates whether multiple prints should be collated. Valid values are
@@ -263,10 +263,10 @@ func (d *devMode) String() string {
 		s.WriteString(fmt.Sprintf("    Duplex: %s\n", d.Duplex().String()))
 	}
 	if f.yResolutionSet() {
-		s.WriteString(fmt.Sprintf("    Y Resolution: %d\n", d.YResolution()))
+		s.WriteString(fmt.Sprintf("    Y Resolution: %d dpi\n", d.YResolution()))
 	}
 	if f.ttOptionSet() {
-		s.WriteString(fmt.Sprintf("    TT Option: %d\n", d.TTOption()))
+		s.WriteString(fmt.Sprintf("    TT Option: %s\n", d.TTOption().String()))
 	}
 	if f.collateSet() {
 		s.WriteString(fmt.Sprintf("    Collate: %d\n", d.Collate()))
@@ -884,6 +884,26 @@ func (d duplex) String() string {
 		return "Short Edge Binding"
 	default:
 		err := fmt.Errorf("unknown duplex value: %d", d)
+		fyne.LogError("Invalid DevMode setting: ", err)
+		return "Invalid value"
+	}
+}
+
+type ttOption int16
+
+// String returns the ttOption value as a string.
+func (t ttOption) String() string {
+	switch t {
+	case C.DMTT_BITMAP:
+		return "Bitmap"
+	case C.DMTT_DOWNLOAD:
+		return "Download"
+	case C.DMTT_SUBDEV:
+		return "Substitute printer fonts"
+	case C.DMTT_DOWNLOAD_OUTLINE:
+		return "Download as outline soft fonts"
+	default:
+		err := fmt.Errorf("unknown ttOption value: %d", t)
 		fyne.LogError("Invalid DevMode setting: ", err)
 		return "Invalid value"
 	}
