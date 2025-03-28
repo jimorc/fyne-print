@@ -74,25 +74,25 @@ func (d *devMode) PaperSize() paperSize {
 
 // PaperLength returns the printer's media size length in 1/10ths of a mm. This
 // value is valid only if PaperSize return 0.
-func (d *devMode) PaperLength() uint16 {
+func (d *devMode) PaperLength() float32 {
 	p := unsafe.Pointer(&d.anon0[0])
-	pSlice := (*[unsafe.Sizeof(d.anon0)]uint16)(p)[4:6]
-	return pSlice[0]
+	pSlice := (*[unsafe.Sizeof(d.anon0)]uint16)(p)[2:3]
+	return float32(pSlice[0]) / 10.
 }
 
 // PaperWidth returns the printer's media size width in 1/10ths of a mm. This
 // value is valid only if PaperSize return 0.
-func (d *devMode) PaperWidth() uint16 {
+func (d *devMode) PaperWidth() float32 {
 	p := unsafe.Pointer(&d.anon0[0])
-	pSlice := (*[unsafe.Sizeof(d.anon0)]uint16)(p)[6:8]
-	return pSlice[0]
+	pSlice := (*[unsafe.Sizeof(d.anon0)]uint16)(p)[3:4]
+	return float32(pSlice[0]) / 10.
 }
 
 // Scale returns the percentage by which the image is to be scaled for printing.
 // The image's media size is scaled to the physical page by the factor of Scale()/100.
 func (d *devMode) Scale() uint16 {
 	p := unsafe.Pointer(&d.anon0[0])
-	pSlice := (*[unsafe.Sizeof(d.anon0)]uint16)(p)[8:10]
+	pSlice := (*[unsafe.Sizeof(d.anon0)]uint16)(p)[4:5]
 	return pSlice[0]
 }
 
@@ -100,7 +100,7 @@ func (d *devMode) Scale() uint16 {
 // multiple copies
 func (d *devMode) Copies() uint16 {
 	p := unsafe.Pointer(&d.anon0[0])
-	pSlice := (*[unsafe.Sizeof(d.anon0)]uint16)(p)[10:12]
+	pSlice := (*[unsafe.Sizeof(d.anon0)]uint16)(p)[5:6]
 	return pSlice[0]
 }
 
@@ -109,7 +109,7 @@ func (d *devMode) Copies() uint16 {
 // is DMBIN_FORMSOURCE, the input bin should be selected automatically.
 func (d *devMode) DefaultSource() uint16 {
 	p := unsafe.Pointer(&d.anon0[0])
-	pSlice := (*[unsafe.Sizeof(d.anon0)]uint16)(p)[12:14]
+	pSlice := (*[unsafe.Sizeof(d.anon0)]uint16)(p)[6:7]
 	return pSlice[0]
 }
 
@@ -124,7 +124,7 @@ func (d *devMode) DefaultSource() uint16 {
 // for the x resolution, and the y resolution is specified by YResolution.
 func (d *devMode) PrintQuality() uint16 {
 	p := unsafe.Pointer(&d.anon0[0])
-	pSlice := (*[unsafe.Sizeof(d.anon0)]uint16)(p)[14:16]
+	pSlice := (*[unsafe.Sizeof(d.anon0)]uint16)(p)[7:8]
 	return pSlice[0]
 }
 
@@ -238,10 +238,10 @@ func (d *devMode) String() string {
 		s.WriteString(fmt.Sprintf("    Paper Size: %s\n", d.PaperSize().String()))
 	}
 	if f.paperLengthSet() {
-		s.WriteString(fmt.Sprintf("    Paper Length: %d\n", d.PaperLength()))
+		s.WriteString(fmt.Sprintf("    Paper Length: %.1f mm\n", d.PaperLength()))
 	}
 	if f.paperWidthSet() {
-		s.WriteString(fmt.Sprintf("    Paper Width: %d\n", d.PaperWidth()))
+		s.WriteString(fmt.Sprintf("    Paper Width: %.1f mm\n", d.PaperWidth()))
 	}
 	if f.scaleSet() {
 		s.WriteString(fmt.Sprintf("    Scale: %d\n", d.Scale()))
