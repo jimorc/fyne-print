@@ -130,8 +130,8 @@ func (d *devMode) PrintQuality() printQuality {
 
 // Color indicates whether a color printer should print in color or monochrome mode.
 // The returned value is one of DMCOLOR_COLOR or DMCOLOR_MONOCHROME.
-func (d *devMode) Color() uint16 {
-	return uint16(d.dmColor)
+func (d *devMode) Color() color {
+	return color(d.dmColor)
 }
 
 // Duplex specifies duplex (double-sided) printing for duplex-capable printers.
@@ -256,7 +256,7 @@ func (d *devMode) String() string {
 		s.WriteString(fmt.Sprintf("    Print Quality: %s\n", d.PrintQuality().String()))
 	}
 	if f.colorSet() {
-		s.WriteString(fmt.Sprintf("    Color: %d\n", d.Color()))
+		s.WriteString(fmt.Sprintf("    Color: %s\n", d.Color().String()))
 	}
 	if f.duplexSet() {
 		s.WriteString(fmt.Sprintf("    Duplex: %d\n", d.Duplex()))
@@ -851,5 +851,19 @@ func (p printQuality) String() string {
 		} else {
 			return fmt.Sprintf("Unknown value: %d", p)
 		}
+	}
+}
+
+type color uint16
+
+// String returns the color value as a string.
+func (c color) String() string {
+	switch c {
+	case C.DMCOLOR_MONOCHROME:
+		return "Monochrome"
+	case C.DMCOLOR_COLOR:
+		return "Color"
+	default:
+		return fmt.Sprintf("Unknown value: %d", c)
 	}
 }
