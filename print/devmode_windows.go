@@ -9,6 +9,7 @@ import (
 	"strings"
 	"unsafe"
 
+	"fyne.io/fyne/v2"
 	"golang.org/x/sys/windows"
 )
 
@@ -136,8 +137,8 @@ func (d *devMode) Color() color {
 
 // Duplex specifies duplex (double-sided) printing for duplex-capable printers.
 // The returned value is one of DMDUP_HORIZONTAL, DM_DUP_SIMPLEX, and DMDUP_VERTICAL.
-func (d *devMode) Duplex() uint16 {
-	return uint16(d.dmDuplex)
+func (d *devMode) Duplex() duplex {
+	return duplex(d.dmDuplex)
 }
 
 // YResolution returns the y resolution of the printer in DPI. This value is valid only
@@ -259,7 +260,7 @@ func (d *devMode) String() string {
 		s.WriteString(fmt.Sprintf("    Color: %s\n", d.Color().String()))
 	}
 	if f.duplexSet() {
-		s.WriteString(fmt.Sprintf("    Duplex: %d\n", d.Duplex()))
+		s.WriteString(fmt.Sprintf("    Duplex: %s\n", d.Duplex().String()))
 	}
 	if f.yResolutionSet() {
 		s.WriteString(fmt.Sprintf("    Y Resolution: %d\n", d.YResolution()))
@@ -854,6 +855,7 @@ func (p printQuality) String() string {
 	}
 }
 
+// color defines the color setting (color or monochrome) for the printer.
 type color uint16
 
 // String returns the color value as a string.
@@ -865,5 +867,24 @@ func (c color) String() string {
 		return "Color"
 	default:
 		return fmt.Sprintf("Unknown value: %d", c)
+	}
+}
+
+// duplex defines the duplex setting for the printer.
+type duplex uint16
+
+// String returns the duplex value as a string.
+func (d duplex) String() string {
+	switch d {
+	case C.DMDUP_SIMPLEX:
+		return "Simplex"
+	case C.DMDUP_VERTICAL:
+		return "Long Edge Binding"
+	case C.DMDUP_HORIZONTAL:
+		return "Short Edge Binding"
+	default:
+		err := fmt.Errorf("Unknown duplex value: %d", d)
+		fyne.LogError("Invalid DevMode setting: ", err)
+		return "Invalid value"
 	}
 }
