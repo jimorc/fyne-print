@@ -107,10 +107,10 @@ func (d *devMode) Copies() uint16 {
 // DefaultSource returns the printer's default input bin. This must be one of
 // // the DMBIN-prefixed constants defined in wingdi.h. If the specified constant
 // is DMBIN_FORMSOURCE, the input bin should be selected automatically.
-func (d *devMode) DefaultSource() uint16 {
+func (d *devMode) DefaultSource() defaultSource {
 	p := unsafe.Pointer(&d.anon0[0])
 	pSlice := (*[unsafe.Sizeof(d.anon0)]uint16)(p)[6:7]
-	return pSlice[0]
+	return defaultSource(pSlice[0])
 }
 
 // PrintQuality returns the printer resolution. The following negative constant
@@ -244,13 +244,13 @@ func (d *devMode) String() string {
 		s.WriteString(fmt.Sprintf("    Paper Width: %.1f mm\n", d.PaperWidth()))
 	}
 	if f.scaleSet() {
-		s.WriteString(fmt.Sprintf("    Scale: %d%\n", d.Scale()))
+		s.WriteString(fmt.Sprintf("    Scale: %d%%\n", d.Scale()))
 	}
 	if f.copiesSet() {
 		s.WriteString(fmt.Sprintf("    Copies: %d\n", d.Copies()))
 	}
 	if f.defaultSourceSet() {
-		s.WriteString(fmt.Sprintf("    Default Source: %d\n", d.DefaultSource()))
+		s.WriteString(fmt.Sprintf("    Default Source: %s\n", d.DefaultSource().String()))
 	}
 	if f.printQualitySet() {
 		s.WriteString(fmt.Sprintf("    Print Quality: %d\n", d.PrintQuality()))
@@ -791,5 +791,40 @@ func (p paperSize) String() string {
 			return "DMPAPER_USER Defined"
 		}
 		return fmt.Sprintf("Unknown paper size: %d", p)
+	}
+}
+
+type defaultSource uint16
+
+func (d defaultSource) String() string {
+	switch d {
+	case C.DMBIN_UPPER:
+		return "DMBIN_UPPER"
+	case C.DMBIN_LOWER:
+		return "Lower"
+	case C.DMBIN_MIDDLE:
+		return "DMBIN_MIDDLE"
+	case C.DMBIN_MANUAL:
+		return "DMBIN_MANUAL"
+	case C.DMBIN_ENVELOPE:
+		return "DMBIN_ENVELOPE"
+	case C.DMBIN_ENVMANUAL:
+		return "DMBIN_ENVMANUAL"
+	case C.DMBIN_AUTO:
+		return "DMBIN_AUTO"
+	case C.DMBIN_TRACTOR:
+		return "DMBIN_TRACTOR"
+	case C.DMBIN_SMALLFMT:
+		return "DMBIN_SMALLFMT"
+	case C.DMBIN_LARGEFMT:
+		return "DMBIN_LARGEFMT"
+	case C.DMBIN_LARGECAPACITY:
+		return "DMBIN_LARGECAPACITY"
+	case C.DMBIN_CASSETTE:
+		return "DMBIN_CASSETTE"
+	case C.DMBIN_FORMSOURCE:
+		return "DMBIN_FORMSOURCE"
+	default:
+		return fmt.Sprintf("Unknown: %d", d)
 	}
 }
