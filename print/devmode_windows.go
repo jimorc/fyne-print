@@ -179,7 +179,7 @@ func (d *devMode) Nup() nup {
 	return nup(pSlice[0])
 }
 
-// ICMMethod specifies how ICM processing can.should be performed. Valid values and
+// ICMMethod specifies how ICM processing should be performed. Valid values and
 // their meanings are a follows:
 // DMICMMETHOD_NONE: ICM is disabled.
 // DMICMMETHOD_SYSTEM: ICM is handled by the print system.
@@ -194,8 +194,8 @@ func (d *devMode) ICMMethod() icmMethod {
 // DMICM_CONTRAST: Maximize color contrast.
 // DMICM_COLORIMETRIC: Use specific color metric.
 // DMICM_ABS_COLORIMETRIC: Use specific color metric.
-func (d *devMode) ICMIntent() uint32 {
-	return uint32(d.dmICMIntent)
+func (d *devMode) ICMIntent() icmIntent {
+	return icmIntent(d.dmICMIntent)
 }
 
 // MediaType returns the media type. Valid values and meanings are as follows:
@@ -281,7 +281,7 @@ func (d *devMode) String() string {
 		s.WriteString(fmt.Sprintf("    ICM Method: %s\n", d.ICMMethod().String()))
 	}
 	if f.icmIntentSet() {
-		s.WriteString(fmt.Sprintf("    ICM Intent: %d\n", d.ICMIntent()))
+		s.WriteString(fmt.Sprintf("    ICM Intent: %s\n", d.ICMIntent().String()))
 	}
 	if f.mediaTypeSet() {
 		s.WriteString(fmt.Sprintf("    Media Type: %d\n", d.MediaType()))
@@ -963,6 +963,29 @@ func (i icmMethod) String() string {
 		return "Device"
 	default:
 		err := fmt.Errorf("unknown icmMethod value: %d", i)
+		fyne.LogError("Invalid DevMode setting: ", err)
+		return "Invalid value"
+	}
+}
+
+// icmIntent spcifies which color matching method, or intent, should
+// be used by default.  This member is primarily for non-ICM applications.
+// ICM applications can establish intents by using the ICM functions.
+type icmIntent uint32
+
+// String returns the ICMIntent value as a string.
+func (i icmIntent) String() string {
+	switch i {
+	case C.DMICM_SATURATE:
+		return "Saturate"
+	case C.DMICM_CONTRAST:
+		return "Contrast"
+	case C.DMICM_COLORIMETRIC:
+		return "Colorimetric"
+	case C.DMICM_ABS_COLORIMETRIC:
+		return "Absolute Colorimetric"
+	default:
+		err := fmt.Errorf("unknown icmIntent value: %d", i)
 		fyne.LogError("Invalid DevMode setting: ", err)
 		return "Invalid value"
 	}
