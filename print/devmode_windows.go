@@ -218,8 +218,8 @@ func (d *devMode) MediaType() mediaType {
 // DMDITHER_RESERVED8: LineArt dithering.
 // DMDITHER_RESERVED9: LineArt dithering.
 // DMDITHER_GRAYSCALE: Device does grayscaling.
-func (d *devMode) DitherType() uint32 {
-	return uint32(d.dmDitherType)
+func (d *devMode) DitherType() ditherType {
+	return ditherType(d.dmDitherType)
 }
 
 func (d *devMode) String() string {
@@ -287,7 +287,7 @@ func (d *devMode) String() string {
 		s.WriteString(fmt.Sprintf("    Media Type: %s\n", d.MediaType().String()))
 	}
 	if f.ditherTypeSet() {
-		s.WriteString(fmt.Sprintf("    Dither Type: %d\n", d.DitherType()))
+		s.WriteString(fmt.Sprintf("    Dither Type: %s\n", d.DitherType().String()))
 	}
 	return s.String()
 }
@@ -1008,6 +1008,42 @@ func (m mediaType) String() string {
 			return "User Defined"
 		}
 		err := fmt.Errorf("unknown mediaType value: %d", m)
+		fyne.LogError("Invalid DevMode setting: ", err)
+		return "Invalid value"
+	}
+}
+
+// ditherType specifies how dithering is to be done.
+type ditherType uint32
+
+// String returns the ditherType value as a string.
+func (d ditherType) String() string {
+	switch d {
+	case C.DMDITHER_NONE:
+		return "None"
+	case C.DMDITHER_COARSE:
+		return "Coarse"
+	case C.DMDITHER_FINE:
+		return "Fine"
+	case C.DMDITHER_LINEART:
+		return "Lineart"
+	case C.DMDITHER_ERRORDIFFUSION:
+		return "Error Diffusion"
+	case C.DMDITHER_RESERVED6:
+		return "Reserved6"
+	case C.DMDITHER_RESERVED7:
+		return "Reserved7"
+	case C.DMDITHER_RESERVED8:
+		return "Reserved8"
+	case C.DMDITHER_RESERVED9:
+		return "Reserved9"
+	case C.DMDITHER_GRAYSCALE:
+		return "Grayscale"
+	default:
+		if d >= C.DMDITHER_USER {
+			return "User Defined"
+		}
+		err := fmt.Errorf("unknown ditherType value: %d", d)
 		fyne.LogError("Invalid DevMode setting: ", err)
 		return "Invalid value"
 	}
