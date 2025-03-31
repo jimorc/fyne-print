@@ -791,7 +791,9 @@ func (p paperSize) String() string {
 		if p >= C.DMPAPER_USER {
 			return "DMPAPER_USER Defined"
 		}
-		return fmt.Sprintf("Unknown paper size: %d", p)
+		err := fmt.Errorf("unknown paper size: %d", p)
+		fyne.LogError("Invalid DevMode setting: ", err)
+		return "Invalid value"
 	}
 }
 
@@ -828,7 +830,12 @@ func (d defaultSource) String() string {
 	case C.DMBIN_FORMSOURCE:
 		return "DMBIN_FORMSOURCE"
 	default:
-		return fmt.Sprintf("Unknown: %d", d)
+		if d >= C.DMBIN_USER {
+			return "DMBIN_USER Defined"
+		}
+		err := fmt.Errorf("unknown default source: %d", d)
+		fyne.LogError("Invalid DevMode setting: ", err)
+		return "Invalid value"
 	}
 }
 
@@ -850,6 +857,8 @@ func (p printQuality) String() string {
 		if p > 0 {
 			return fmt.Sprintf("%d dpi", p)
 		} else {
+			err := fmt.Errorf("unknown print quality: %d", p)
+			fyne.LogError("Invalid DevMode setting: ", err)
 			return fmt.Sprintf("Unknown value: %d", p)
 		}
 	}
@@ -866,6 +875,8 @@ func (c color) String() string {
 	case C.DMCOLOR_COLOR:
 		return "Color"
 	default:
+		err := fmt.Errorf("unknown color value: %d", c)
+		fyne.LogError("Invalid DevMode setting: ", err)
 		return fmt.Sprintf("Unknown value: %d", c)
 	}
 }
