@@ -153,91 +153,8 @@ func (pi2 *PrinterInfo2) PrinterUntilTime() string {
 
 // PrinterStatus returns the printer status as a string slice.
 // The following statuses are not defined by cgo, so they cannot
-func (pi2 *PrinterInfo2) PrinterStatus() []string {
-	var status []string
-	s := pi2.Status
-	if s&C.PRINTER_STATUS_PAUSED != 0 {
-		status = append(status, "Paused\n")
-	}
-	if s&C.PRINTER_STATUS_ERROR != 0 {
-		status = append(status, "Error\n")
-	}
-	if s&C.PRINTER_STATUS_PENDING_DELETION != 0 {
-		status = append(status, "Pending Deletion\n")
-	}
-	if s&C.PRINTER_STATUS_PAPER_JAM != 0 {
-		status = append(status, "Paper Jam\n")
-	}
-	if s&C.PRINTER_STATUS_PAPER_OUT != 0 {
-		status = append(status, "Paper Out\n")
-	}
-	if s&C.PRINTER_STATUS_MANUAL_FEED != 0 {
-		status = append(status, "Manual Feed\n")
-	}
-	if s&C.PRINTER_STATUS_PAPER_PROBLEM != 0 {
-		status = append(status, "Paper Problem\n")
-	}
-	if s&C.PRINTER_STATUS_OFFLINE != 0 {
-		status = append(status, "Offline\n")
-	}
-	if s&C.PRINTER_STATUS_IO_ACTIVE != 0 {
-		status = append(status, "Active\n")
-	}
-	if s&C.PRINTER_STATUS_BUSY != 0 {
-		status = append(status, "Busy\n")
-	}
-	if s&C.PRINTER_STATUS_PRINTING != 0 {
-		status = append(status, "Printing\n")
-	}
-	if s&C.PRINTER_STATUS_OUTPUT_BIN_FULL != 0 {
-		status = append(status, "Output Bin Full\n")
-	}
-	if s&C.PRINTER_STATUS_NOT_AVAILABLE != 0 {
-		status = append(status, "Not Available\n")
-	}
-	if s&C.PRINTER_STATUS_WAITING != 0 {
-		status = append(status, "Waiting\n")
-	}
-	if s&C.PRINTER_STATUS_PROCESSING != 0 {
-		status = append(status, "Processing\n")
-	}
-	if s&C.PRINTER_STATUS_INITIALIZING != 0 {
-		status = append(status, "Initializing\n")
-	}
-	if s&C.PRINTER_STATUS_WARMING_UP != 0 {
-		status = append(status, "Warming Up\n")
-	}
-	if s&C.PRINTER_STATUS_TONER_LOW != 0 {
-		status = append(status, "Toner Low\n")
-	}
-	if s&C.PRINTER_STATUS_NO_TONER != 0 {
-		status = append(status, "No Toner\n")
-	}
-	if s&C.PRINTER_STATUS_PAGE_PUNT != 0 {
-		status = append(status, "Page Cannot Be Printed\n")
-	}
-	if s&C.PRINTER_STATUS_USER_INTERVENTION != 0 {
-		status = append(status, "User Intervention Required\n")
-	}
-	if s&C.PRINTER_STATUS_OUT_OF_MEMORY != 0 {
-		status = append(status, "Out of Memory\n")
-	}
-	if s&C.PRINTER_STATUS_DOOR_OPEN != 0 {
-		status = append(status, "Door Open\n")
-	}
-	if s&C.PRINTER_STATUS_SERVER_UNKNOWN != 0 {
-		status = append(status, "Server Unknown\n")
-	}
-	if s&C.PRINTER_STATUS_POWER_SAVE != 0 {
-		status = append(status, "Power Save\n")
-	}
-	if s&C.PRINTER_STATUS_SERVER_UNKNOWN != 0 {
-		status = append(status, "Server Unknown\n")
-	}
-	if s&0x04000000 != 0 { // PRINTER_STATUS_DRIVER_UPDATE_NEEDED not defined by cgo
-		status = append(status, "Driver Update Needed\n")
-	}
-	return status
+func (pi2 *PrinterInfo2) PrinterStatus() printerStatus {
+	return printerStatus(pi2.Status)
 }
 
 // QueuedJobs returns the number of jobs queued for the printer.
@@ -272,7 +189,8 @@ func (pi2 *PrinterInfo2) String() string {
 	s.WriteString(fmt.Sprintf("    Default Priority: %d\n", pi2.DefPriority()))
 	s.WriteString(fmt.Sprintf("    Start Time: %s\n", pi2.PrinterStartTime()))
 	s.WriteString(fmt.Sprintf("    Until Time: %s\n", pi2.PrinterUntilTime()))
-	s.WriteString(fmt.Sprintf("    Status: %s\n", pi2.PrinterStatus()))
+	s.WriteString("    Status:\n")
+	s.WriteString(prepend("    ", pi2.PrinterStatus().String()))
 	s.WriteString(fmt.Sprintf("    Jobs: %d\n", pi2.QueuedJobs()))
 	s.WriteString(fmt.Sprintf("    Average PPMs: %d\n", pi2.AveragePpm()))
 	return s.String()
@@ -337,4 +255,99 @@ func (a attributes) String() string {
 		s.WriteString("    TS\n")
 	}
 	return s.String()
+}
+
+type printerStatus uint32
+
+// String outputs the printer status as a string.
+// PrinterStatus returns the printer status as a string slice.
+// The following statuses are not defined by cgo, so they cannot
+func (ps printerStatus) String() string {
+	var status strings.Builder
+	if ps == 0 {
+		status.WriteString("    None")
+		return status.String()
+	}
+	if ps&C.PRINTER_STATUS_PAUSED != 0 {
+		status.WriteString("    Paused")
+	}
+	if ps&C.PRINTER_STATUS_ERROR != 0 {
+		status.WriteString("    Error")
+	}
+	if ps&C.PRINTER_STATUS_PENDING_DELETION != 0 {
+		status.WriteString("    Pending Deletion")
+	}
+	if ps&C.PRINTER_STATUS_PAPER_JAM != 0 {
+		status.WriteString("    Paper Jam")
+	}
+	if ps&C.PRINTER_STATUS_PAPER_OUT != 0 {
+		status.WriteString("    Paper Out")
+	}
+	if ps&C.PRINTER_STATUS_MANUAL_FEED != 0 {
+		status.WriteString("    Manual Feed")
+	}
+	if ps&C.PRINTER_STATUS_PAPER_PROBLEM != 0 {
+		status.WriteString("    Paper Problem")
+	}
+	if ps&C.PRINTER_STATUS_OFFLINE != 0 {
+		status.WriteString("    Offline")
+	}
+	if ps&C.PRINTER_STATUS_IO_ACTIVE != 0 {
+		status.WriteString("    Active")
+	}
+	if ps&C.PRINTER_STATUS_BUSY != 0 {
+		status.WriteString("    Busy")
+	}
+	if ps&C.PRINTER_STATUS_PRINTING != 0 {
+		status.WriteString("    Printing")
+	}
+	if ps&C.PRINTER_STATUS_OUTPUT_BIN_FULL != 0 {
+		status.WriteString("    Output Bin Full")
+	}
+	if ps&C.PRINTER_STATUS_NOT_AVAILABLE != 0 {
+		status.WriteString("    Not Available")
+	}
+	if ps&C.PRINTER_STATUS_WAITING != 0 {
+		status.WriteString("    Waiting")
+	}
+	if ps&C.PRINTER_STATUS_PROCESSING != 0 {
+		status.WriteString("    Processing")
+	}
+	if ps&C.PRINTER_STATUS_INITIALIZING != 0 {
+		status.WriteString("    Initializing")
+	}
+	if ps&C.PRINTER_STATUS_WARMING_UP != 0 {
+		status.WriteString("    Warming Up")
+	}
+	if ps&C.PRINTER_STATUS_TONER_LOW != 0 {
+		status.WriteString("    Toner Low")
+	}
+	if ps&C.PRINTER_STATUS_NO_TONER != 0 {
+		status.WriteString("    No Toner")
+	}
+	if ps&C.PRINTER_STATUS_PAGE_PUNT != 0 {
+		status.WriteString("    Page Cannot Be Printed")
+	}
+	if ps&C.PRINTER_STATUS_USER_INTERVENTION != 0 {
+		status.WriteString("    User Intervention Required")
+	}
+	if ps&C.PRINTER_STATUS_OUT_OF_MEMORY != 0 {
+		status.WriteString("    Out of Memory")
+	}
+	if ps&C.PRINTER_STATUS_DOOR_OPEN != 0 {
+		status.WriteString("    Door Open")
+	}
+	if ps&C.PRINTER_STATUS_SERVER_UNKNOWN != 0 {
+		status.WriteString("    Server Unknown")
+	}
+	if ps&C.PRINTER_STATUS_POWER_SAVE != 0 {
+		status.WriteString("    Power Save")
+	}
+	if ps&C.PRINTER_STATUS_SERVER_UNKNOWN != 0 {
+		status.WriteString("    Server Unknown")
+	}
+	if ps&0x04000000 != 0 { // PRINTER_STATUS_DRIVER_UPDATE_NEEDED not defined by cgo
+		status.WriteString("    Driver Update Needed")
+	}
+	return status.String()
 }
