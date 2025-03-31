@@ -185,8 +185,8 @@ func (d *devMode) Nup() nup {
 // DMICMMETHOD_SYSTEM: ICM is handled by the print system.
 // DMICMMETHOD_DRIVER: ICM is handled by the printer driver.
 // DMICMMETHOD_DEVICE: ICM is handled by the printer device.
-func (d *devMode) ICMMethod() uint32 {
-	return uint32(d.dmICMMethod)
+func (d *devMode) ICMMethod() icmMethod {
+	return icmMethod(d.dmICMMethod)
 }
 
 // ICMIntent specifies the ICM Intent. Valud values and meanings are as follows:
@@ -278,7 +278,7 @@ func (d *devMode) String() string {
 		s.WriteString(fmt.Sprintf("    Nup: %s\n", d.Nup().String()))
 	}
 	if f.icmMethodSet() {
-		s.WriteString(fmt.Sprintf("    ICM Method: %d\n", d.ICMMethod()))
+		s.WriteString(fmt.Sprintf("    ICM Method: %s\n", d.ICMMethod().String()))
 	}
 	if f.icmIntentSet() {
 		s.WriteString(fmt.Sprintf("    ICM Intent: %d\n", d.ICMIntent()))
@@ -939,6 +939,30 @@ func (n nup) String() string {
 		return "Application does"
 	default:
 		err := fmt.Errorf("unknown nup value: %d", n)
+		fyne.LogError("Invalid DevMode setting: ", err)
+		return "Invalid value"
+	}
+}
+
+// icmMethod specifies how ICM is handled.  For a non-ICM application,
+// this member determines if ICM is enabled or disabled. For ICM
+// applications, the system examines this member to determine how to
+// handle ICM support.
+type icmMethod uint32
+
+// String returns the ICMMethod value as a string.
+func (i icmMethod) String() string {
+	switch i {
+	case C.DMICMMETHOD_NONE:
+		return "None"
+	case C.DMICMMETHOD_SYSTEM:
+		return "System"
+	case C.DMICMMETHOD_DRIVER:
+		return "Driver"
+	case C.DMICMMETHOD_DEVICE:
+		return "Device"
+	default:
+		err := fmt.Errorf("unknown icmMethod value: %d", i)
 		fyne.LogError("Invalid DevMode setting: ", err)
 		return "Invalid value"
 	}
