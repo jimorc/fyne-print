@@ -121,8 +121,8 @@ func (pi2 *PrinterInfo2) SecurityDescriptor() *securityDescriptor {
 // Attrs returns the printer attributes.
 // See http://learn.microsoft.com/en-us/windows/win32/printdocs/printer-info-2
 // for values.
-func (pi2 *PrinterInfo2) Attrs() uint32 {
-	return uint32(pi2.Attributes)
+func (pi2 *PrinterInfo2) Attrs() attributes {
+	return attributes((pi2.Attributes))
 }
 
 // JobPriority returns the priority value that the spooler uses to route print jobs.
@@ -157,85 +157,85 @@ func (pi2 *PrinterInfo2) PrinterStatus() []string {
 	var status []string
 	s := pi2.Status
 	if s&C.PRINTER_STATUS_PAUSED != 0 {
-		status = append(status, "Paused")
+		status = append(status, "Paused\n")
 	}
 	if s&C.PRINTER_STATUS_ERROR != 0 {
-		status = append(status, "Error")
+		status = append(status, "Error\n")
 	}
 	if s&C.PRINTER_STATUS_PENDING_DELETION != 0 {
-		status = append(status, "Pending Deletion")
+		status = append(status, "Pending Deletion\n")
 	}
 	if s&C.PRINTER_STATUS_PAPER_JAM != 0 {
-		status = append(status, "Paper Jam")
+		status = append(status, "Paper Jam\n")
 	}
 	if s&C.PRINTER_STATUS_PAPER_OUT != 0 {
-		status = append(status, "Paper Out")
+		status = append(status, "Paper Out\n")
 	}
 	if s&C.PRINTER_STATUS_MANUAL_FEED != 0 {
-		status = append(status, "Manual Feed")
+		status = append(status, "Manual Feed\n")
 	}
 	if s&C.PRINTER_STATUS_PAPER_PROBLEM != 0 {
-		status = append(status, "Paper Problem")
+		status = append(status, "Paper Problem\n")
 	}
 	if s&C.PRINTER_STATUS_OFFLINE != 0 {
-		status = append(status, "Offline")
+		status = append(status, "Offline\n")
 	}
 	if s&C.PRINTER_STATUS_IO_ACTIVE != 0 {
-		status = append(status, "Active")
+		status = append(status, "Active\n")
 	}
 	if s&C.PRINTER_STATUS_BUSY != 0 {
-		status = append(status, "Busy")
+		status = append(status, "Busy\n")
 	}
 	if s&C.PRINTER_STATUS_PRINTING != 0 {
-		status = append(status, "Printing")
+		status = append(status, "Printing\n")
 	}
 	if s&C.PRINTER_STATUS_OUTPUT_BIN_FULL != 0 {
-		status = append(status, "Output Bin Full")
+		status = append(status, "Output Bin Full\n")
 	}
 	if s&C.PRINTER_STATUS_NOT_AVAILABLE != 0 {
-		status = append(status, "Not Available")
+		status = append(status, "Not Available\n")
 	}
 	if s&C.PRINTER_STATUS_WAITING != 0 {
-		status = append(status, "Waiting")
+		status = append(status, "Waiting\n")
 	}
 	if s&C.PRINTER_STATUS_PROCESSING != 0 {
-		status = append(status, "Processing")
+		status = append(status, "Processing\n")
 	}
 	if s&C.PRINTER_STATUS_INITIALIZING != 0 {
-		status = append(status, "Initializing")
+		status = append(status, "Initializing\n")
 	}
 	if s&C.PRINTER_STATUS_WARMING_UP != 0 {
-		status = append(status, "Warming Up")
+		status = append(status, "Warming Up\n")
 	}
 	if s&C.PRINTER_STATUS_TONER_LOW != 0 {
-		status = append(status, "Toner Low")
+		status = append(status, "Toner Low\n")
 	}
 	if s&C.PRINTER_STATUS_NO_TONER != 0 {
-		status = append(status, "No Toner")
+		status = append(status, "No Toner\n")
 	}
 	if s&C.PRINTER_STATUS_PAGE_PUNT != 0 {
-		status = append(status, "Page Cannot Be Printed")
+		status = append(status, "Page Cannot Be Printed\n")
 	}
 	if s&C.PRINTER_STATUS_USER_INTERVENTION != 0 {
-		status = append(status, "User Intervention Required")
+		status = append(status, "User Intervention Required\n")
 	}
 	if s&C.PRINTER_STATUS_OUT_OF_MEMORY != 0 {
-		status = append(status, "Out of Memory")
+		status = append(status, "Out of Memory\n")
 	}
 	if s&C.PRINTER_STATUS_DOOR_OPEN != 0 {
-		status = append(status, "Door Open")
+		status = append(status, "Door Open\n")
 	}
 	if s&C.PRINTER_STATUS_SERVER_UNKNOWN != 0 {
-		status = append(status, "Server Unknown")
+		status = append(status, "Server Unknown\n")
 	}
 	if s&C.PRINTER_STATUS_POWER_SAVE != 0 {
-		status = append(status, "Power Save")
+		status = append(status, "Power Save\n")
 	}
 	if s&C.PRINTER_STATUS_SERVER_UNKNOWN != 0 {
-		status = append(status, "Server Unknown")
+		status = append(status, "Server Unknown\n")
 	}
 	if s&0x04000000 != 0 { // PRINTER_STATUS_DRIVER_UPDATE_NEEDED not defined by cgo
-		status = append(status, "Driver Update Needed")
+		status = append(status, "Driver Update Needed\n")
 	}
 	return status
 }
@@ -266,7 +266,8 @@ func (pi2 *PrinterInfo2) String() string {
 	s.WriteString(fmt.Sprintf("    Print Processor: %s\n", pi2.PrintProcessor()))
 	s.WriteString(fmt.Sprintf("    Data Type: %s\n", pi2.Datatype()))
 	s.WriteString(fmt.Sprintf("    Parameters: %s\n", pi2.Parameters()))
-	s.WriteString(fmt.Sprintf("    Attributes: %d\n", pi2.Attrs()))
+	s.WriteString("    Attributes:\n")
+	s.WriteString(prepend("    ", pi2.Attrs().String()))
 	s.WriteString(fmt.Sprintf("    Priority: %d\n", pi2.JobPriority()))
 	s.WriteString(fmt.Sprintf("    Default Priority: %d\n", pi2.DefPriority()))
 	s.WriteString(fmt.Sprintf("    Start Time: %s\n", pi2.PrinterStartTime()))
@@ -274,5 +275,66 @@ func (pi2 *PrinterInfo2) String() string {
 	s.WriteString(fmt.Sprintf("    Status: %s\n", pi2.PrinterStatus()))
 	s.WriteString(fmt.Sprintf("    Jobs: %d\n", pi2.QueuedJobs()))
 	s.WriteString(fmt.Sprintf("    Average PPMs: %d\n", pi2.AveragePpm()))
+	return s.String()
+}
+
+// attributes specify the printer attributes.
+type attributes uint32
+
+// String outputs the attributes as a string.
+func (a attributes) String() string {
+	var s strings.Builder
+	if a == 0 {
+		s.WriteString("    None\n")
+		return s.String()
+	}
+	if a&C.PRINTER_ATTRIBUTE_QUEUED != 0 {
+		s.WriteString("    Queued\n")
+	}
+	if a&C.PRINTER_ATTRIBUTE_DIRECT != 0 {
+		s.WriteString("    Direct\n")
+	}
+	if a&C.PRINTER_ATTRIBUTE_DEFAULT != 0 {
+		s.WriteString("    Default\n")
+	}
+	if a&C.PRINTER_ATTRIBUTE_SHARED != 0 {
+		s.WriteString("    Shared\n")
+	}
+	if a&C.PRINTER_ATTRIBUTE_NETWORK != 0 {
+		s.WriteString("    Network\n")
+	}
+	if a&C.PRINTER_ATTRIBUTE_HIDDEN != 0 {
+		s.WriteString("    Hidden\n")
+	}
+	if a&C.PRINTER_ATTRIBUTE_LOCAL != 0 {
+		s.WriteString("    Local\n")
+	}
+	if a&C.PRINTER_ATTRIBUTE_ENABLE_DEVQ != 0 {
+		s.WriteString("    Enable DevQ\n")
+	}
+	if a&C.PRINTER_ATTRIBUTE_KEEPPRINTEDJOBS != 0 {
+		s.WriteString("    Keep Printed Jobs\n")
+	}
+	if a&C.PRINTER_ATTRIBUTE_DO_COMPLETE_FIRST != 0 {
+		s.WriteString("    Do Complete First\n")
+	}
+	if a&C.PRINTER_ATTRIBUTE_WORK_OFFLINE != 0 {
+		s.WriteString("    Work Offline\n")
+	}
+	if a&C.PRINTER_ATTRIBUTE_ENABLE_BIDI != 0 {
+		s.WriteString("    Enable BiDirectional\n")
+	}
+	if a&C.PRINTER_ATTRIBUTE_RAW_ONLY != 0 {
+		s.WriteString("    Raw Only\n")
+	}
+	if a&C.PRINTER_ATTRIBUTE_PUBLISHED != 0 {
+		s.WriteString("    Published\n")
+	}
+	if a&C.PRINTER_ATTRIBUTE_FAX != 0 {
+		s.WriteString("    Fax\n")
+	}
+	if a&C.PRINTER_ATTRIBUTE_TS != 0 {
+		s.WriteString("    TS\n")
+	}
 	return s.String()
 }
