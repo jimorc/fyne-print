@@ -202,8 +202,8 @@ func (d *devMode) ICMIntent() icmIntent {
 // DMMEDIA_STANDARD: Standard paper.
 // DMMEDIA_TRANSPARENCY: Transparency.
 // DMMEDIA_GLOSSY: Glossy paper.
-func (d *devMode) MediaType() uint32 {
-	return uint32(d.dmMediaType)
+func (d *devMode) MediaType() mediaType {
+	return mediaType(d.dmMediaType)
 }
 
 // DitherType specifies how dithering is performed. Valid values and meanings
@@ -284,7 +284,7 @@ func (d *devMode) String() string {
 		s.WriteString(fmt.Sprintf("    ICM Intent: %s\n", d.ICMIntent().String()))
 	}
 	if f.mediaTypeSet() {
-		s.WriteString(fmt.Sprintf("    Media Type: %d\n", d.MediaType()))
+		s.WriteString(fmt.Sprintf("    Media Type: %s\n", d.MediaType().String()))
 	}
 	if f.ditherTypeSet() {
 		s.WriteString(fmt.Sprintf("    Dither Type: %d\n", d.DitherType()))
@@ -986,6 +986,28 @@ func (i icmIntent) String() string {
 		return "Absolute Colorimetric"
 	default:
 		err := fmt.Errorf("unknown icmIntent value: %d", i)
+		fyne.LogError("Invalid DevMode setting: ", err)
+		return "Invalid value"
+	}
+}
+
+// mediaType specifies the type of media being printed on.
+type mediaType uint32
+
+// String returns the mediaType value as a string.
+func (m mediaType) String() string {
+	switch m {
+	case C.DMMEDIA_STANDARD:
+		return "Standard"
+	case C.DMMEDIA_TRANSPARENCY:
+		return "Transparency"
+	case C.DMMEDIA_GLOSSY:
+		return "Glossy"
+	default:
+		if m >= C.DMMEDIA_USER {
+			return "User Defined"
+		}
+		err := fmt.Errorf("unknown mediaType value: %d", m)
 		fyne.LogError("Invalid DevMode setting: ", err)
 		return "Invalid value"
 	}
