@@ -42,6 +42,11 @@ func (f *formInfo2) keyWord() string {
 	return windows.UTF16PtrToString((*uint16)(unsafe.Pointer(f.pKeyword)))
 }
 
+// stringType returns the formInfo2's string type.
+func (f *formInfo2) stringType() stringType {
+	return stringType(f.StringType)
+}
+
 // String returns a string representation of the formInfo2 object.
 func (f *formInfo2) String() string {
 	var s strings.Builder
@@ -50,6 +55,7 @@ func (f *formInfo2) String() string {
 	s.WriteString(fmt.Sprintf("Form Size: %s\n", f.size().String()))
 	s.WriteString(fmt.Sprintf("Imageable Area: %s\n", f.imageableArea().String()))
 	s.WriteString(fmt.Sprintf("Keyword: %s\n", f.keyWord()))
+	s.WriteString(fmt.Sprintf("String Type: %s\n", f.stringType().String()))
 	return s.String()
 }
 
@@ -92,7 +98,7 @@ func (f formSize) inInches() fyne.Size {
 	return fyne.NewSize(float32(f.cx)/25400, float32(f.cy)/25400)
 }
 
-// imageableArea returns the imageable area of a formSize object.
+// imageableArea is the imageable area of a formInfo2 object.
 type imageableArea C.RECTL
 
 // String returns a string representation of an imageableArea object.
@@ -100,4 +106,39 @@ func (i imageableArea) String() string {
 	return fmt.Sprintf("(%.3f, %.3f) mm to (%.3f, %.3f) mm",
 		(float32(i.left))/1000, (float32(i.top))/1000,
 		(float32(i.right))/1000, (float32(i.bottom))/1000)
+}
+
+// stringType is the string type of a formInfo2 object.
+type stringType uint32
+
+// the following values represent the string types. They are defined here
+// because they are not defined in the mingw64 winspool.h file.
+const (
+	STRING_NONE     stringType = 0x00000001
+	STRING_MUIDLL   stringType = 0x00000002
+	STRING_LANGPAIR stringType = 0x00000004
+)
+
+// String returns a string representation of a stringType object.
+func (st stringType) String() string {
+	var s strings.Builder
+	if st == 0 {
+		return "Unknown value"
+	}
+	if st&STRING_NONE != 0 {
+		s.WriteString("None")
+	}
+	if st&STRING_MUIDLL != 0 {
+		if s.Len() > 0 {
+			s.WriteString(" | ")
+		}
+		s.WriteString("MuiDLL")
+	}
+	if st&STRING_LANGPAIR != 0 {
+		if s.Len() > 0 {
+			s.WriteString(" | ")
+		}
+		s.WriteString("LangPair")
+	}
+	return s.String()
 }
