@@ -20,6 +20,11 @@ func (f *formInfo2) flags() formInfo2Flags {
 	return formInfo2Flags(f.Flags)
 }
 
+// formName returns the formInfo2 object's form name.
+func (f *formInfo2) formName() string {
+	return windows.UTF16PtrToString((*uint16)(unsafe.Pointer(f.pName)))
+}
+
 // size returns the form size in thousandths of a mm.
 func (f *formInfo2) size() formSize {
 	return formSize(f.Size)
@@ -41,8 +46,7 @@ func (f *formInfo2) keyWord() string {
 func (f *formInfo2) String() string {
 	var s strings.Builder
 	s.WriteString(fmt.Sprintf("Form Type: %s\n", f.flags().String()))
-	s.WriteString(fmt.Sprintf("Form Name: %s\n", windows.UTF16PtrToString(
-		(*uint16)(unsafe.Pointer(f.pName)))))
+	s.WriteString(fmt.Sprintf("Form Name: %s\n", f.formName()))
 	s.WriteString(fmt.Sprintf("Form Size: %s\n", f.size().String()))
 	s.WriteString(fmt.Sprintf("Imageable Area: %s\n", f.imageableArea().String()))
 	s.WriteString(fmt.Sprintf("Keyword: %s\n", f.keyWord()))
