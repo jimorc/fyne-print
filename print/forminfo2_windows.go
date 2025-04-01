@@ -30,6 +30,13 @@ func (f *formInfo2) imageableArea() imageableArea {
 	return imageableArea(f.ImageableArea)
 }
 
+// keyWord returns the formInfo2 object's keyWord.
+// This keyWord is used to identify the form in all locales.
+// Unfortunately, not all forms have keyWord values.
+func (f *formInfo2) keyWord() string {
+	return windows.UTF16PtrToString((*uint16)(unsafe.Pointer(f.pKeyword)))
+}
+
 // String returns a string representation of the formInfo2 object.
 func (f *formInfo2) String() string {
 	var s strings.Builder
@@ -38,6 +45,7 @@ func (f *formInfo2) String() string {
 		(*uint16)(unsafe.Pointer(f.pName)))))
 	s.WriteString(fmt.Sprintf("Form Size: %s\n", f.size().String()))
 	s.WriteString(fmt.Sprintf("Imageable Area: %s\n", f.imageableArea().String()))
+	s.WriteString(fmt.Sprintf("Keyword: %s\n", f.keyWord()))
 	return s.String()
 }
 
