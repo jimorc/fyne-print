@@ -47,6 +47,15 @@ func (f *formInfo2) stringType() stringType {
 	return stringType(f.StringType)
 }
 
+// muiDLL returns the formInfo2's localized resource DLL that contains the
+// localized display name.
+func (f *formInfo2) muiDLL() string {
+	if f.stringType().isMuidll() {
+		return windows.UTF16PtrToString((*uint16)(unsafe.Pointer(f.pMuiDll)))
+	}
+	return ""
+}
+
 // String returns a string representation of the formInfo2 object.
 func (f *formInfo2) String() string {
 	var s strings.Builder
@@ -56,6 +65,9 @@ func (f *formInfo2) String() string {
 	s.WriteString(fmt.Sprintf("Imageable Area: %s\n", f.imageableArea().String()))
 	s.WriteString(fmt.Sprintf("Keyword: %s\n", f.keyWord()))
 	s.WriteString(fmt.Sprintf("String Type: %s\n", f.stringType().String()))
+	if f.stringType().isMuidll() {
+		s.WriteString(fmt.Sprintf("MUI DLL: %s\n", f.muiDLL()))
+	}
 	return s.String()
 }
 
@@ -141,4 +153,14 @@ func (st stringType) String() string {
 		s.WriteString("LangPair")
 	}
 	return s.String()
+}
+
+// isMuidll returns true if the stringType contains STRING_MUIDLL.
+func (st stringType) isMuidll() bool {
+	return st&STRING_MUIDLL != 0
+}
+
+// isLangPain returns true if the stringType contains STRING_LANGPAIR.
+func (st stringType) isLangPair() bool {
+	return st&STRING_LANGPAIR != 0
 }
