@@ -6,8 +6,10 @@ import "C"
 import (
 	"fmt"
 	"strings"
+	"unsafe"
 
 	"fyne.io/fyne/v2"
+	"golang.org/x/sys/windows"
 )
 
 // formInfo2 contains information about a localizable printer (media) form.
@@ -22,6 +24,8 @@ func (f *formInfo2) flags() formInfo2Flags {
 func (f *formInfo2) String() string {
 	var s strings.Builder
 	s.WriteString(fmt.Sprintf("Form Type: %s\n", f.flags().String()))
+	s.WriteString(fmt.Sprintf("Form Name: %s\n", windows.UTF16PtrToString(
+		(*uint16)(unsafe.Pointer(f.pName)))))
 	return s.String()
 }
 
