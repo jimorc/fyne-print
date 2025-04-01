@@ -25,6 +25,11 @@ func (f *formInfo2) size() formSize {
 	return formSize(f.Size)
 }
 
+// imageableArea returns the imageable are of a formInfo2 object.
+func (f *formInfo2) imageableArea() imageableArea {
+	return imageableArea(f.ImageableArea)
+}
+
 // String returns a string representation of the formInfo2 object.
 func (f *formInfo2) String() string {
 	var s strings.Builder
@@ -32,6 +37,7 @@ func (f *formInfo2) String() string {
 	s.WriteString(fmt.Sprintf("Form Name: %s\n", windows.UTF16PtrToString(
 		(*uint16)(unsafe.Pointer(f.pName)))))
 	s.WriteString(fmt.Sprintf("Form Size: %s\n", f.size().String()))
+	s.WriteString(fmt.Sprintf("Imageable Area: %s\n", f.imageableArea().String()))
 	return s.String()
 }
 
@@ -72,4 +78,14 @@ func (f formSize) inMM() fyne.Size {
 // imInches returns the size of a formSize object in inches.
 func (f formSize) inInches() fyne.Size {
 	return fyne.NewSize(float32(f.cx)/25400, float32(f.cy)/25400)
+}
+
+// imageableArea returns the imageable area of a formSize object.
+type imageableArea C.RECTL
+
+// String returns a string representation of an imageableArea object.
+func (i imageableArea) String() string {
+	return fmt.Sprintf("(%.3f, %.3f) mm to (%.3f, %.3f) mm",
+		(float32(i.left))/1000, (float32(i.top))/1000,
+		(float32(i.right))/1000, (float32(i.bottom))/1000)
 }
