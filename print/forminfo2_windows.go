@@ -20,12 +20,18 @@ func (f *formInfo2) flags() formInfo2Flags {
 	return formInfo2Flags(f.Flags)
 }
 
-// String returns a string representation of the formInfo2 object
+// size returns the form size in thousandths of a mm.
+func (f *formInfo2) size() formSize {
+	return formSize(f.Size)
+}
+
+// String returns a string representation of the formInfo2 object.
 func (f *formInfo2) String() string {
 	var s strings.Builder
 	s.WriteString(fmt.Sprintf("Form Type: %s\n", f.flags().String()))
 	s.WriteString(fmt.Sprintf("Form Name: %s\n", windows.UTF16PtrToString(
 		(*uint16)(unsafe.Pointer(f.pName)))))
+	s.WriteString(fmt.Sprintf("Form Size: %s\n", f.size().String()))
 	return s.String()
 }
 
@@ -46,4 +52,24 @@ func (f formInfo2Flags) String() string {
 		fyne.LogError("Invalid FormInfo setting: %s", err)
 		return "Unknown form type"
 	}
+}
+
+// formSize represents the Size field of a formInfo2 object.
+type formSize C.SIZEL
+
+// String returns a string representation of a formSize object.
+func (f formSize) String() string {
+	m := f.inMM()
+	i := f.inInches()
+	return fmt.Sprintf("%.3f x %.3f mm (%.3f x %.3f in)", m.Width, m.Height, i.Width, i.Height)
+}
+
+// inMM returns the size of a formSize object in mm.
+func (f formSize) inMM() fyne.Size {
+	return fyne.NewSize(float32(f.cx)/1000, float32(f.cy)/1000)
+}
+
+// imInches returns the size of a formSize object in inches.
+func (f formSize) inInches() fyne.Size {
+	return fyne.NewSize(float32(f.cx)/25400, float32(f.cy)/25400)
 }
