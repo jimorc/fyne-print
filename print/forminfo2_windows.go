@@ -61,6 +61,14 @@ func (f *formInfo2) muiResourceId() uint32 {
 	return (uint32(f.dwResourceId))
 }
 
+// displayName returns the localized display name for the formInfo2 object.
+func (f *formInfo2) displayName() string {
+	if f.stringType().isLangPair() {
+		return windows.UTF16PtrToString((*uint16)(unsafe.Pointer(f.pDisplayName)))
+	}
+	return ""
+}
+
 // String returns a string representation of the formInfo2 object.
 func (f *formInfo2) String() string {
 	var s strings.Builder
@@ -73,6 +81,9 @@ func (f *formInfo2) String() string {
 	if f.stringType().isMuidll() {
 		s.WriteString(fmt.Sprintf("MUI DLL: %s\n", f.muiDLL()))
 		s.WriteString(fmt.Sprintf("MUI Resource ID: %d\n", f.muiResourceId()))
+	}
+	if f.stringType().isLangPair() {
+		s.WriteString(fmt.Sprintf("Display Name: %s\n", f.displayName()))
 	}
 	return s.String()
 }
