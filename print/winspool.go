@@ -29,6 +29,7 @@ var (
 	modwinspool = syscall.NewLazyDLL("winspool.drv")
 
 	procDeviceCapabilities = modwinspool.NewProc("DeviceCapabilitiesW")
+	procEnumForms          = modwinspool.NewProc("EnumFormsW")
 	procEnumPrinters       = modwinspool.NewProc("EnumPrintersW")
 	procGetDefaultPrinter  = modwinspool.NewProc("GetDefaultPrinterW")
 	procOpenPrinter        = modwinspool.NewProc("OpenPrinterW")
@@ -113,4 +114,35 @@ func openPrinter(pName string, printerDefs *PrinterDefaults) syscall.Handle {
 		return syscall.Handle(0)
 	}
 	return prHandle
+}
+
+/*
+enumForms returns the formInfo2 objects for a printer. This is the media size,
+and localizable name of each form.
+See https://learn.microsoft.com/en-us/windows/win32/printdocs/form-info-2 for information
+on the arguments.
+This function should be called twice, the first time with a zero or small buffer length
+to determine the required buffer size, and the second time to retrieve all of the
+formInfo2 objects. The retrieved formInfo2 slice should then be shortened to the
+actual number of objects retrieved. This is necessary because the first call returns
+a 'needed' size that is much larger than is actually needed.
+
+Returns:
+  - a slice of formInfo2 objects, or nil on error.
+  - an error object if an error other than syscall.ERROR_INSUFFICIENT_BUFFER.
+*/
+func enumForms(printerHandle syscall.Handle, level uint32, forms []formInfo2,
+	cbBuf uint32, needed *uint32, cReturned *uint32) ([]formInfo2, error) {
+	r1, _, err := procEnumForms.Call(
+		uintptr(printerHandle),
+		uintptr(level),
+		uintptr(unsafe.Pointer(&forms[0])),
+		uintptr(cbBuf),
+		uintptr(unsafe.Pointer(needed)),
+		uintptr(unsafe.Pointer(cReturned)))
+	if r1 == 0 && err != syscall.ERROR_INSUFFICIENT_BUFFER {
+		fyne.LogError("Failed to enumerate forms", err)
+		return nil, err
+	}
+	return forms, nil
 }
