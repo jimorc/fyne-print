@@ -56,6 +56,11 @@ func (f *formInfo2) muiDLL() string {
 	return ""
 }
 
+// muiResourceId returns the resource ID of the formInfo2's display name.
+func (f *formInfo2) muiResourceId() uint32 {
+	return (uint32(f.dwResourceId))
+}
+
 // String returns a string representation of the formInfo2 object.
 func (f *formInfo2) String() string {
 	var s strings.Builder
@@ -67,6 +72,7 @@ func (f *formInfo2) String() string {
 	s.WriteString(fmt.Sprintf("String Type: %s\n", f.stringType().String()))
 	if f.stringType().isMuidll() {
 		s.WriteString(fmt.Sprintf("MUI DLL: %s\n", f.muiDLL()))
+		s.WriteString(fmt.Sprintf("MUI Resource ID: %d\n", f.muiResourceId()))
 	}
 	return s.String()
 }
