@@ -69,6 +69,10 @@ func (f *formInfo2) displayName() string {
 	return ""
 }
 
+func (f *formInfo2) langId() langID {
+	return langID(f.wLangId)
+}
+
 // String returns a string representation of the formInfo2 object.
 func (f *formInfo2) String() string {
 	var s strings.Builder
@@ -84,6 +88,7 @@ func (f *formInfo2) String() string {
 	}
 	if f.stringType().isLangPair() {
 		s.WriteString(fmt.Sprintf("Display Name: %s\n", f.displayName()))
+		s.WriteString(fmt.Sprintf("Language ID: %s\n", f.langId().String()))
 	}
 	return s.String()
 }
@@ -138,6 +143,9 @@ func (i imageableArea) String() string {
 }
 
 // stringType is the string type of a formInfo2 object.
+// In some languages (e.g. 'en-XX'), stringType may contain STRING_LANGPAIR.
+// In other languages, and for the same formInfo2, stringType may not contain
+// STRING_LANGPAIR.
 type stringType uint32
 
 // the following values represent the string types. They are defined here
@@ -180,4 +188,19 @@ func (st stringType) isMuidll() bool {
 // isLangPain returns true if the stringType contains STRING_LANGPAIR.
 func (st stringType) isLangPair() bool {
 	return st&STRING_LANGPAIR != 0
+}
+
+// langID is the language that the stringType is returned in.
+type langID uint16
+
+// String returns a string representation of the langID field.
+func (l langID) String() string {
+	lcid := uint32(C.SORT_DEFAULT)<<16 | uint32(l)
+	const MAX_LOCALE_NAME = 85
+	lName := make([]uint16, MAX_LOCALE_NAME)
+	res := LCIDToLocaleName(C.LCID(lcid), &lName[0], MAX_LOCALE_NAME, 0)
+	if res == 0 {
+		return "Unknown language"
+	}
+	return windows.UTF16ToString(lName[:MAX_LOCALE_NAME])
 }
