@@ -67,3 +67,9 @@ func (p *Printer) getMediaSizes() {
 	// Therefore, the slice of objects should be reduced to the number actually returned.
 	p.forms = p.forms[:returned]
 }
+
+// close cleans up Printer-related data such as the printer handle.
+func (p *Printer) close() {
+	closePrinter(p.handle)
+	p.handle = 0
+}

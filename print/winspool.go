@@ -28,12 +28,25 @@ const (
 var (
 	modwinspool = syscall.NewLazyDLL("winspool.drv")
 
+	procClosePrinter       = modwinspool.NewProc("ClosePrinter")
 	procDeviceCapabilities = modwinspool.NewProc("DeviceCapabilitiesW")
 	procEnumForms          = modwinspool.NewProc("EnumFormsW")
 	procEnumPrinters       = modwinspool.NewProc("EnumPrintersW")
 	procGetDefaultPrinter  = modwinspool.NewProc("GetDefaultPrinterW")
 	procOpenPrinter        = modwinspool.NewProc("OpenPrinterW")
 )
+
+// closePrinter closes the printer.
+//
+// Params:
+//
+//	printerHandle is the handle of the printer to close.
+func closePrinter(printerHandle syscall.Handle) {
+	r1, _, err := procClosePrinter.Call(uintptr(printerHandle))
+	if r1 == 0 {
+		fyne.LogError("Failed to close printer", err)
+	}
+}
 
 /*
 // devicvCapabilities retrieves the capabilities of a printer driver.

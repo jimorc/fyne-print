@@ -65,3 +65,10 @@ func NewPrinters() *Printers {
 func (p *Printers) Add(printer *Printer) {
 	*p = append(*p, *printer)
 }
+
+// ClosePrinters calls Printer.close for all printers.
+func (p *Printers) ClosePrinters() {
+	for _, printer := range *p {
+		printer.close()
+	}
+}

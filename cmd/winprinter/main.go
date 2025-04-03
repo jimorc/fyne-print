@@ -12,4 +12,5 @@ func main() {
 		fmt.Printf("Printer %d:\n", i)
 		fmt.Println(pr.String())
 	}
+	p.ClosePrinters()
 }
