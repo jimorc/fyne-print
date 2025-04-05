@@ -1,4 +1,4 @@
-//go:build !windows
+//go:build windows
 
 package print
 
@@ -17,7 +17,7 @@ func (m MediaSizes) AsString() string {
 	var s strings.Builder
 	s.WriteString("MediaSizes:\n")
 	for _, ms := range m {
-		s.WriteString(ms.AsString())
+		s.WriteString(ms.String())
 	}
 	return s.String()
 }

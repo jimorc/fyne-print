@@ -14,7 +14,7 @@ type Margins struct {
 }
 
 // String converts the Margins object to a string.
-func (m *Margins) String() string {
+func (m Margins) String() string {
 	var s strings.Builder
 	s.WriteString("Margins:")
 	s.WriteString(fmt.Sprintf("    top: %.2f", m.top))
