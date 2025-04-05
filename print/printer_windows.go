@@ -13,8 +13,6 @@ import (
 	"fyne.io/fyne/v2"
 )
 
-var allForms []formInfo2
-
 // Printer is a struct that allows access to a printer.
 type Printer struct {
 	pi2        PrinterInfo2
@@ -78,25 +76,25 @@ func (pr *Printer) String() string {
 // getMediaSizes retrieves the printer's formInfo2 objects. This is all of the
 // media sizes that the printer might support.
 func (p *Printer) getMediaSizes() {
-	allForms = make([]formInfo2, 1)
+	p.forms = make([]formInfo2, 1)
 	var cbBuf uint32 = uint32(unsafe.Sizeof(formInfo2{}))
 	var needed uint32
 	var returned uint32
-	_, err := enumForms(p.handle, 2, allForms, 0, &needed, &returned)
+	_, err := enumForms(p.handle, 2, p.forms, 0, &needed, &returned)
 	if err != nil && err != syscall.ERROR_INSUFFICIENT_BUFFER {
 		fyne.LogError("Error getting media sizes: ", err)
 		return
 	}
-	allForms = make([]formInfo2, needed/uint32(unsafe.Sizeof(formInfo2{})))
+	p.forms = make([]formInfo2, needed/uint32(unsafe.Sizeof(formInfo2{})))
 	cbBuf = needed
-	_, err = enumForms(p.handle, 2, allForms, cbBuf, &needed, &returned)
+	_, err = enumForms(p.handle, 2, p.forms, cbBuf, &needed, &returned)
 	if err != nil {
 		fyne.LogError("Error getting media sizes: ", err)
 	}
 	// The 'needed' parameter requested many more objects than are actually returned.
 	// Therefore, the slice of objects should be reduced to the number actually returned.
-	allForms = allForms[:returned]
-	for _, fi2 := range allForms {
+	p.forms = p.forms[:returned]
+	/*	for _, fi2 := range allForms {
 		fi := make([]byte, 1)
 		needed = 1
 		getForm(p.handle, fi2.formName(), &(fi[0]), &needed)
@@ -107,7 +105,7 @@ func (p *Printer) getMediaSizes() {
 			form := *(*formInfo2)(unsafe.Pointer(&fi[0]))
 			p.forms = append(p.forms, form)
 		}
-	}
+	}*/
 }
 
 func (p *Printer) getPaperNames() error {

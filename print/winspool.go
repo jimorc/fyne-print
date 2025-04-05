@@ -33,7 +33,6 @@ var (
 	procEnumForms          = modwinspool.NewProc("EnumFormsW")
 	procEnumPrinters       = modwinspool.NewProc("EnumPrintersW")
 	procGetDefaultPrinter  = modwinspool.NewProc("GetDefaultPrinterW")
-	procGetForm            = modwinspool.NewProc("GetFormW")
 	procOpenPrinter        = modwinspool.NewProc("OpenPrinterW")
 )
 
@@ -116,24 +115,6 @@ func enumPrinters(flags uint32,
 		return err
 	}
 */
-
-func getForm(printerHandle syscall.Handle, name string, buf *byte, needed *uint32) error {
-	n, _ := syscall.UTF16FromString(name)
-	size := *needed
-	*needed = 0
-	r1, _, err := procGetForm.Call(
-		uintptr(printerHandle),
-		uintptr(unsafe.Pointer(&n[0])),
-		uintptr(2),
-		uintptr(unsafe.Pointer(buf)),
-		uintptr(size),
-		uintptr(unsafe.Pointer(needed)))
-	if r1 == 0 && err != syscall.ERROR_INSUFFICIENT_BUFFER {
-		fyne.LogError("Failed to get form", err)
-		return err
-	}
-	return nil
-}
 
 func openPrinter(pName string, printerDefs *PrinterDefaults) syscall.Handle {
 	name, _ := syscall.UTF16FromString(pName)
