@@ -9,25 +9,6 @@ import (
 	"strings"
 )
 
-// Margins is a struct containing the margins for each side of the media.
-type Margins struct {
-	left   int
-	right  int
-	top    int
-	bottom int
-}
-
-// AsString converts the Margins object to a string.
-func (m *Margins) AsString() string {
-	var s strings.Builder
-	s.WriteString("Margins:")
-	s.WriteString(fmt.Sprintf("    top: %d", m.top))
-	s.WriteString(fmt.Sprintf("    bottom: %d", m.bottom))
-	s.WriteString(fmt.Sprintf("    left: %d", m.left))
-	s.WriteString(fmt.Sprintf("    right: %d\n", m.right))
-	return s.String()
-}
-
 // MediaSize contains the PWG name, localized name, width, length, and margins for
 // the media.
 type MediaSize struct {
@@ -44,8 +25,8 @@ func newMediaSize(cupsSize *C.cups_size_t, pr *Printer) MediaSize {
 	return s
 }
 
-// AsString converts the MediaSize object to a string (for printing).
-func (s *MediaSize) AsString() string {
+// String converts the MediaSize object to a string (for printing).
+func (s *MediaSize) String() string {
 	var b strings.Builder
 	b.WriteString("MediaSize:")
 	b.WriteString(fmt.Sprintf("    Media Name: %s\n", s.MediaName()))
