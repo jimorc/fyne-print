@@ -2,6 +2,14 @@
 
 package print
 
+import (
+	"syscall"
+	"unsafe"
+
+	"fyne.io/fyne/v2"
+	"golang.org/x/sys/windows"
+)
+
 // intPaperSize is the paper size as integer values. When retrieved using deviceCapabilities,
 // the size is in tenths of a millimeter.
 type intPaperSize struct {
@@ -65,3 +73,42 @@ const (
 	pruLPM printRateUnit = 3 // PRINTRATEUNIT_LPM
 	pruIPM printRateUnit = 4 // PRINTRATEUNIT_IPM
 )
+
+var (
+	modgdi32 = syscall.NewLazyDLL("gdi32.dll")
+
+	procCreateDC      = modgdi32.NewProc("CreateDCW")
+	procDeleteDC      = modgdi32.NewProc("DeleteDC")
+	procGetDeviceCaps = modgdi32.NewProc("GetDeviceCaps")
+)
+
+// createDC creates a device context for the named printer.
+//
+// Params:
+//
+//	prName is the name of the printer as held in the printer's PrinterInfo2 struct.
+//
+// Returns the printer's device context, or 0 on error.
+func createDC(prName string) syscall.Handle {
+	n, _ := windows.UTF16FromString(prName)
+	r1, _, err := procCreateDC.Call(0, uintptr(unsafe.Pointer(&n[0])), 0, 0)
+	if r1 == 0 {
+		fyne.LogError("Error creating printer DC: ", err)
+	}
+	return syscall.Handle(r1)
+}
+
+// deleteDC deletes a device context. The dc should have been created using
+// createDC. Do not call deleteDC for a dc that was created using the GetDC function.
+//
+// Params:
+//
+//	dc is the device context to delete.
+func deleteDC(dc syscall.Handle) {
+	procDeleteDC.Call(uintptr(dc))
+}
+
+func getDeviceCaps(dc syscall.Handle, item int32) int32 {
+	r1, _, _ := procGetDeviceCaps.Call(uintptr(dc), uintptr(item))
+	return int32(r1)
+}

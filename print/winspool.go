@@ -33,6 +33,7 @@ var (
 	procEnumForms          = modwinspool.NewProc("EnumFormsW")
 	procEnumPrinters       = modwinspool.NewProc("EnumPrintersW")
 	procGetDefaultPrinter  = modwinspool.NewProc("GetDefaultPrinterW")
+	procGetForm            = modwinspool.NewProc("GetFormW")
 	procOpenPrinter        = modwinspool.NewProc("OpenPrinterW")
 )
 
@@ -48,8 +49,7 @@ func closePrinter(printerHandle syscall.Handle) {
 	}
 }
 
-/*
-// devicvCapabilities retrieves the capabilities of a printer driver.
+// deviceCapabilities retrieves the capabilities of a printer driver.
 // See https://learn.microsoft.com/en-us/windows/win32/printdocs/documentproperties
 // for information on the arguments.
 //
@@ -61,22 +61,24 @@ func closePrinter(printerHandle syscall.Handle) {
 // If the function returns -1, this may mean either that the capability is not supported or
 // there was a general function failure.
 func deviceCapabilities(name string,
-
-		port string,
-		capability devCapIndex,
-		output uintptr,
-		devMode *PrinterDevMode) (int32, error) {
-		n, _ := syscall.UTF16FromString(name)
-		p, _ := syscall.UTF16FromString(port)
-		r1, _, err := procDeviceCapabilities.Call(
-			uintptr(unsafe.Pointer(&n[0])),
-			uintptr(unsafe.Pointer(&p[0])),
-			uintptr(capability),
-			output,
-			uintptr(unsafe.Pointer(devMode)))
-		return int32(r1), err
+	port string,
+	capability devCapIndex,
+	output uintptr,
+	devMode *devMode) (int32, error) {
+	n, _ := syscall.UTF16FromString(name)
+	p, _ := syscall.UTF16FromString(port)
+	r1, _, err := procDeviceCapabilities.Call(
+		uintptr(unsafe.Pointer(&n[0])),
+		uintptr(unsafe.Pointer(&p[0])),
+		uintptr(capability),
+		output,
+		uintptr(unsafe.Pointer(devMode)))
+	if int32(r1) == -1 && err != syscall.ERROR_INSUFFICIENT_BUFFER {
+		fyne.LogError("Failed to get device capabilities", err)
 	}
-*/
+	return int32(r1), err
+}
+
 // enumPrinters enumerates available printers, print servers, domains, or print providers.
 // See https://learn.microsoft.com/en-us/windows/win32/printdocs/enumprinters for information
 // on the arguments.
@@ -114,6 +116,25 @@ func enumPrinters(flags uint32,
 		return err
 	}
 */
+
+func getForm(printerHandle syscall.Handle, name string, buf *byte, needed *uint32) error {
+	n, _ := syscall.UTF16FromString(name)
+	size := *needed
+	*needed = 0
+	r1, _, err := procGetForm.Call(
+		uintptr(printerHandle),
+		uintptr(unsafe.Pointer(&n[0])),
+		uintptr(2),
+		uintptr(unsafe.Pointer(buf)),
+		uintptr(size),
+		uintptr(unsafe.Pointer(needed)))
+	if r1 == 0 && err != syscall.ERROR_INSUFFICIENT_BUFFER {
+		fyne.LogError("Failed to get form", err)
+		return err
+	}
+	return nil
+}
+
 func openPrinter(pName string, printerDefs *PrinterDefaults) syscall.Handle {
 	name, _ := syscall.UTF16FromString(pName)
 	var prHandle syscall.Handle
