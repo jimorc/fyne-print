@@ -7,6 +7,7 @@ require (
 	fyne.io/x/fyne v0.0.0-20250106132206-3228f6c50107
 	github.com/OpenPrinting/goipp v1.1.0
 	github.com/stretchr/testify v1.8.4
+	golang.org/x/sys v0.20.0
 )
 
 require (
@@ -36,7 +37,6 @@ require (
 	golang.org/x/image v0.23.0 // indirect
 	golang.org/x/mobile v0.0.0-20231127183840-76ac6878050a // indirect
 	golang.org/x/net v0.25.0 // indirect
-	golang.org/x/sys v0.20.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

@@ -33,7 +33,7 @@ func (s *MediaSize) String() string {
 	b.WriteString(fmt.Sprintf("    Local Name: %s\n", s.LocalName()))
 	b.WriteString(fmt.Sprintf("    Width: %d\n", s.Width()))
 	b.WriteString(fmt.Sprintf("    Length: %d\n", s.Length()))
-	b.WriteString(s.Margins().AsString())
+	b.WriteString(s.Margins().String())
 	return b.String()
 }
 
@@ -60,6 +60,6 @@ func (s *MediaSize) Length() int {
 
 // Margins retrieves the margins for the media size.
 func (s *MediaSize) Margins() *Margins {
-	return &Margins{left: int(s.size.left), right: int(s.size.right),
-		top: int(s.size.top), bottom: int(s.size.bottom)}
+	return &Margins{left: float32(s.size.left), right: float32(s.size.right),
+		top: float32(s.size.top), bottom: float32(s.size.bottom)}
 }
