@@ -1,5 +1,3 @@
-//go:build windows
-
 package print
 
 import (
@@ -98,6 +96,8 @@ func (ms *MediaSize) String() string {
 	if ms.hasData {
 		s.WriteString(fmt.Sprintf("    Width: %.2f\n", ms.Width()))
 		s.WriteString(fmt.Sprintf("    Height: %.2f\n", ms.Height()))
+		s.WriteString(fmt.Sprintf("    Imageable width: %.2f\n", ms.imageableWidth))
+		s.WriteString(fmt.Sprintf("    Imageable height: %.2f\n", ms.imageableHeight))
 		s.WriteString(ms.Margins().String())
 	} else {
 		s.WriteString("    No data\n")

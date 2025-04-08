@@ -13,14 +13,18 @@ import (
 	"fyne.io/fyne/v2"
 )
 
+var dMode devMode
+
 // Printer is a struct that allows access to a printer.
 type Printer struct {
 	pi2        PrinterInfo2
+	pi8        printerInfo8
+	dMode      *devMode
 	handle     syscall.Handle
 	dc         syscall.Handle
 	forms      []formInfo2
 	mediaNames []string
-	mediaSizes []C.POINTL
+	mediaSizes MediaSizes
 	papers     []uint16
 }
 
@@ -28,16 +32,21 @@ type Printer struct {
 func newPrinter(pInfo2 *PrinterInfo2) *Printer {
 	p := &Printer{pi2: *pInfo2}
 	printerDefs := newPrinterDefaults("RAW", pInfo2.DevMode(),
-		C.PRINTER_ACCESS_USE)
+		C.PRINTER_ALL_ACCESS)
 
 	prHandle := openPrinter(p.pi2.PrinterName(), printerDefs)
 	p.handle = prHandle
-	p.dc = createDC(p.pi2.PrinterName())
-	p.forms = make([]formInfo2, 1)
-	p.getMediaSizes()
-	p.getPaperNames()
-	p.getPaperSizes()
-	p.getPapers()
+	if p.handle != 0 {
+		p.dc = createDC(p.pi2.PrinterName())
+		p.getPrinterInfo8()
+		fmt.Print(p.pi8.String())
+		//
+		//	p.forms = make([]formInfo2, 1)
+		//p.getMediaSizes()
+		p.getPaperNames()
+		//	p.getPaperSizes()
+		p.getPapers()
+	}
 	return p
 }
 
@@ -45,26 +54,37 @@ func newPrinter(pInfo2 *PrinterInfo2) *Printer {
 func (pr *Printer) String() string {
 	var s strings.Builder
 	s.WriteString(fmt.Sprintf("    Handle: %d\n", pr.handle))
-	s.WriteString(fmt.Sprintf("    DC: %d\n", pr.dc))
-	s.WriteString(prepend("    ", pr.pi2.String()))
-	s.WriteString(fmt.Sprintf("    For current paper size, width = %d\n", getDeviceCaps(pr.dc, C.PHYSICALWIDTH)))
-	s.WriteString(fmt.Sprintf("    For current paper size, height = %d\n", getDeviceCaps(pr.dc, C.PHYSICALHEIGHT)))
-	s.WriteString(fmt.Sprintf("    For current paper size, left offset = %d\n", getDeviceCaps(pr.dc, C.PHYSICALOFFSETX)))
-	s.WriteString(fmt.Sprintf("    For current paper size, top offset = %d\n", getDeviceCaps(pr.dc, C.PHYSICALOFFSETY)))
-	s.WriteString(fmt.Sprintf("    For current paper size, printable width = %d\n", getDeviceCaps(pr.dc, C.HORZRES)))
-	s.WriteString(fmt.Sprintf("    For current paper size, printable height = %d\n", getDeviceCaps(pr.dc, C.VERTRES)))
-	s.WriteString(fmt.Sprintf("    Printer has %d Media Sizes:\n", len(pr.forms)))
-	s.WriteString("    Paper Names:\n")
-	for i, f := range pr.forms {
-		s.WriteString(fmt.Sprintf("        Form %d:\n", i))
-		s.WriteString(prepend("          ", f.String()))
+	if pr.handle == 0 {
+		s.WriteString("Printer handle is 0, so no more data\n")
+	} else {
+		s.WriteString(fmt.Sprintf("    DC: %d\n", pr.dc))
+		s.WriteString(prepend("    ", pr.pi2.String()))
+		s.WriteString(prepend("    ", pr.pi8.String()))
+		/*				s.WriteString(fmt.Sprintf("    For current paper size, width = %d\n", getDeviceCaps(pr.dc, C.PHYSICALWIDTH)))
+						s.WriteString(fmt.Sprintf("    For current paper size, height = %d\n", getDeviceCaps(pr.dc, C.PHYSICALHEIGHT)))
+						s.WriteString(fmt.Sprintf("    For current paper size, left offset = %d\n", getDeviceCaps(pr.dc, C.PHYSICALOFFSETX)))
+						s.WriteString(fmt.Sprintf("    For current paper size, top offset = %d\n", getDeviceCaps(pr.dc, C.PHYSICALOFFSETY)))
+						s.WriteString(fmt.Sprintf("    For current paper size, printable width = %d\n", getDeviceCaps(pr.dc, C.HORZRES)))
+						s.WriteString(fmt.Sprintf("    For current paper size, printable height = %d\n", getDeviceCaps(pr.dc, C.VERTRES)))
+		*/
+		s.WriteString(fmt.Sprintf("    Printer has %d Media Sizes:\n", len(pr.mediaSizes)))
+		fmt.Println("Printing media sizes")
+		s.WriteString(pr.mediaSizes.String())
 	}
 
-	for i, n := range pr.mediaNames {
-		s.WriteString(fmt.Sprintf("        Paper Name: %d:\n", i))
-		ss := fmt.Sprintf("%s: %dx%d: %d", n, int32(pr.mediaSizes[i].x), int32(pr.mediaSizes[i].y), pr.papers[i])
+	//	s.WriteString("    Paper Names:\n")
+	/*	for i, f := range pr.forms {
+			s.WriteString(fmt.Sprintf("        Form %d:\n", i))
+			s.WriteString(prepend("          ", f.String()))
+		}
+	*/
+	/*	for i, n := range pr.mediaSizes {
+		s.WriteString(fmt.Sprintf("        Media Size: %d:\n", i))
+		s.WriteString(fmt.Sprintf(prepend("            ", )))
+		ss := fmt.Sprintf("%s: %dx%d: %d", n, int32(pr.mediaSizes[i].Width()), int32(pr.mediaSizes[i].Height()),
+			pr.papers[i])
 		s.WriteString(prepend("          ", ss))
-	}
+	}*/
 	/*	for i, sz := range pr.mediaSizes {
 		s.WriteString(fmt.Sprintf("        Paper Size: %d:\n", i))
 		ss := fmt.Sprintf("%dx%d", int32(sz.x), int32(sz.y))
@@ -75,7 +95,7 @@ func (pr *Printer) String() string {
 
 // getMediaSizes retrieves the printer's formInfo2 objects. This is all of the
 // media sizes that the printer might support.
-func (p *Printer) getMediaSizes() {
+/*func (p *Printer) getMediaSizes() {
 	p.forms = make([]formInfo2, 1)
 	var cbBuf uint32 = uint32(unsafe.Sizeof(formInfo2{}))
 	var needed uint32
@@ -105,8 +125,8 @@ func (p *Printer) getMediaSizes() {
 			form := *(*formInfo2)(unsafe.Pointer(&fi[0]))
 			p.forms = append(p.forms, form)
 		}
-	}*/
-}
+	}
+}*/
 
 func (p *Printer) getPaperNames() error {
 	// get number of paper names
@@ -136,46 +156,49 @@ func (p *Printer) getPaperNames() error {
 			fyne.LogError("Error getting paper names", numErr)
 			return err
 		}
+		fmt.Printf("%d paper names\n", num2)
 		p.mediaNames = make([]string, num2)
 		for i := 0; i < int(num2); i++ {
 			p.mediaNames[i] = syscall.UTF16ToString(names[i][:])
+			fmt.Println(p.mediaNames[i])
 		}
 	}
 	return nil
 }
 
-func (p *Printer) getPaperSizes() error {
-	// get number of paper sizes
-	num, err := deviceCapabilities(p.pi2.PrinterName(),
-		p.pi2.PortName(),
-		C.DC_PAPERSIZE,
-		0,
-		p.pi2.DevMode())
-	if num == -1 {
-		if err == syscall.Errno(0) {
-			err = errors.New("function unsupported, or general error")
-		}
-		fyne.LogError("Error getting paper sizes", err)
-		return err
-	}
-	if num > 0 {
-		// get paper sizes
-		p.mediaSizes = make([]C.POINTL, num)
-		num2, err := deviceCapabilities(p.pi2.PrinterName(),
+/*
+	func (p *Printer) getPaperSizes() error {
+		// get number of paper sizes
+		num, err := deviceCapabilities(p.pi2.PrinterName(),
 			p.pi2.PortName(),
 			C.DC_PAPERSIZE,
-			uintptr(unsafe.Pointer(&p.mediaSizes[0])),
+			0,
 			p.pi2.DevMode())
-		if num2 != num {
-			numErr := fmt.Errorf("returned paper sizes count (%d) does not match number available (%d)",
-				num2, num)
-			fyne.LogError("Error getting paper names", numErr)
+		if num == -1 {
+			if err == syscall.Errno(0) {
+				err = errors.New("function unsupported, or general error")
+			}
+			fyne.LogError("Error getting paper sizes", err)
 			return err
 		}
+		if num > 0 {
+			// get paper sizes
+			p.mediaSizes = make([]C.POINTL, num)
+			num2, err := deviceCapabilities(p.pi2.PrinterName(),
+				p.pi2.PortName(),
+				C.DC_PAPERSIZE,
+				uintptr(unsafe.Pointer(&p.mediaSizes[0])),
+				p.pi2.DevMode())
+			if num2 != num {
+				numErr := fmt.Errorf("returned paper sizes count (%d) does not match number available (%d)",
+					num2, num)
+				fyne.LogError("Error getting paper names", numErr)
+				return err
+			}
+		}
+		return nil
 	}
-	return nil
-}
-
+*/
 func (p *Printer) getPapers() error {
 	// get number of paper sizes
 	num, err := deviceCapabilities(p.pi2.PrinterName(),
@@ -204,8 +227,38 @@ func (p *Printer) getPapers() error {
 			fyne.LogError("Error getting paper names", numErr)
 			return err
 		}
+		p.mediaSizes = make([]MediaSize, num)
+		for i := 0; i < int(num); i++ {
+			p.mediaSizes[i] = newMediaSize(p.mediaNames[i], paperSize(p.papers[i]))
+			p.pi8.pDevMode.dmFields = 0
+			p.pi8.pDevMode.setPaperSize(paperSize(p.papers[i]))
+			pi8 := unsafe.Pointer(&p.pi8)
+			setPrinter(p.handle, pi8)
+			resetDC(p.dc, p.pi8.pDevMode)
+			p.getPrinterInfo8()
+			w := float32(getDeviceCaps(p.dc, C.PHYSICALWIDTH))
+			h := float32(getDeviceCaps(p.dc, C.PHYSICALHEIGHT))
+			l := float32(getDeviceCaps(p.dc, C.PHYSICALOFFSETX))
+			t := float32(getDeviceCaps(p.dc, C.PHYSICALOFFSETY))
+			iW := float32(getDeviceCaps(p.dc, C.HORZRES))
+			iH := float32(getDeviceCaps(p.dc, C.VERTRES))
+			p.mediaSizes[i].setData(w, h, iW, iH, l, t)
+		}
 	}
 	return nil
+}
+
+func (p *Printer) getPrinterInfo8() {
+	var needed uint32
+	pi8 := make([]byte, 1)
+	getPrinter(p.handle, &pi8, uint32(1), &needed)
+	pi8 = make([]byte, needed)
+	getPrinter(p.handle, &pi8, needed, &needed)
+	p8 := pi8[:needed]
+	p.pi8 = *(*printerInfo8)(unsafe.Pointer(&p8))
+	// copy the devMode struct. Otherwise, it just goes out of scope
+	dev := p.pi8.pDevMode.deepCopy()
+	p.pi8.pDevMode = dev
 }
 
 // close cleans up Printer-related data such as the printer handle.

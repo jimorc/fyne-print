@@ -13,8 +13,15 @@ import (
 	"golang.org/x/sys/windows"
 )
 
+// baseDevMode is the part of the DEVMODE struct that does not include the printer
+// manufacturer added part. That is, baseDevMode is the part defined by Microsoft.
+type baseDevMode C.DEVMODE
+
 // devMode is the Win32 DEVMODEW struct
-type devMode C.DEVMODEW
+type devMode struct {
+	baseDevMode
+	extra []byte
+}
 
 //The following methods return the DEVMODEW fields with the "dm" prefix removed.
 
@@ -290,6 +297,61 @@ func (d *devMode) String() string {
 		s.WriteString(fmt.Sprintf("    Dither Type: %s\n", d.DitherType().String()))
 	}
 	return s.String()
+}
+
+// deepCopy performs a deep copy of the devMode struct.
+func (d *devMode) deepCopy() *devMode {
+	nd := &devMode{}
+	for i := 0; i < C.CCHDEVICENAME; i++ {
+		nd.dmDeviceName[i] = d.dmDeviceName[i]
+	}
+	nd.dmSpecVersion = d.dmSpecVersion
+	nd.dmDriverVersion = d.dmDriverVersion
+	nd.dmSize = d.dmSize
+	nd.dmDriverExtra = d.dmDriverExtra
+	nd.dmFields = d.dmFields
+	nd.anon0 = d.anon0
+	nd.dmColor = d.dmColor
+	nd.dmDuplex = d.dmDuplex
+	nd.dmYResolution = d.dmYResolution
+	nd.dmTTOption = d.dmTTOption
+	nd.dmCollate = d.dmCollate
+	for i := 0; i < C.CCHFORMNAME; i++ {
+		nd.dmFormName[i] = d.dmFormName[i]
+	}
+	nd.anon1 = d.anon1
+	nd.dmICMMethod = d.dmICMMethod
+	nd.dmICMIntent = d.dmICMIntent
+	nd.dmMediaType = d.dmMediaType
+	nd.dmDitherType = d.dmDitherType
+	/*	dExtra := uintptr(unsafe.Pointer(&d.dmDitherType)) + unsafe.Sizeof(d.dmDitherType)
+		ndExtra := uintptr(unsafe.Pointer(&nd.dmDitherType)) + unsafe.Sizeof(nd.dmDitherType)
+		for i := 0; i < int(d.dmDriverExtra); i++ {
+			ndExtra = dExtra
+			ndExtra += uintptr(1)
+			dExtra += uintptr(1)
+		}
+		return nd*/
+	nd.copyExtra(d)
+	return nd
+}
+
+func (d *devMode) copyExtra(dM *devMode) {
+	d.extra = make([]byte, d.dmDriverExtra)
+	dExtra := uintptr(unsafe.Pointer(&d.extra))
+	dMExtra := uintptr(unsafe.Pointer(&dM.extra))
+	for i := 0; i < int(d.dmDriverExtra); i++ {
+		dExtra = dMExtra
+		dMExtra += uintptr(1)
+		dExtra += uintptr(1)
+	}
+}
+
+func (d *devMode) setPaperSize(ps paperSize) {
+	p := unsafe.Pointer(&d.anon0[0])
+	pSlice := (*[unsafe.Sizeof(d.anon0) / 2]uint16)(p)[1:2]
+	pSlice[0] = uint16(ps)
+	d.dmFields |= C.DM_PAPERSIZE
 }
 
 // devModeFields is the dmFields value from the devMode object.
@@ -791,9 +853,7 @@ func (p paperSize) String() string {
 		if p >= C.DMPAPER_USER {
 			return "DMPAPER_USER Defined"
 		}
-		err := fmt.Errorf("unknown paper size: %d", p)
-		fyne.LogError("Invalid DevMode setting: ", err)
-		return "Invalid value"
+		return fmt.Sprintf("%d", p)
 	}
 }
 

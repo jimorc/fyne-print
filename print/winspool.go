@@ -33,7 +33,9 @@ var (
 	procEnumForms          = modwinspool.NewProc("EnumFormsW")
 	procEnumPrinters       = modwinspool.NewProc("EnumPrintersW")
 	procGetDefaultPrinter  = modwinspool.NewProc("GetDefaultPrinterW")
+	procGetPrinter         = modwinspool.NewProc("GetPrinterW")
 	procOpenPrinter        = modwinspool.NewProc("OpenPrinterW")
+	procSetPrinter         = modwinspool.NewProc("SetPrinterW")
 )
 
 // closePrinter closes the printer.
@@ -116,6 +118,30 @@ func enumPrinters(flags uint32,
 	}
 */
 
+// getPrinter retrieves the printer's devMode information.
+//
+// Params:
+//
+//		printerHandle is the printer's handle.
+//		pi8 is a pointer to the printerInfo8 struct used to receive the printer information
+//		size is the size in bytes of the pi8 struct.
+//	 needed is the size in bytes that the function sets to the required pi8 buffer size. If size is
+//
+// smaller than this size, then getPrinter fails. If size is greater than or equal to this value,
+// then getPrinter succeeds.
+func getPrinter(printerHandle syscall.Handle, pi8 *[]byte, size uint32, needed *uint32) int32 {
+	r1, _, err := procGetPrinter.Call(
+		uintptr(printerHandle),
+		uintptr(8),
+		uintptr(unsafe.Pointer(pi8)),
+		uintptr(size),
+		uintptr(unsafe.Pointer(needed)))
+	if r1 == 0 && err != syscall.ERROR_INSUFFICIENT_BUFFER {
+		fyne.LogError("Error in getPrinter call: ", err)
+	}
+	return int32(r1)
+}
+
 func openPrinter(pName string, printerDefs *PrinterDefaults) syscall.Handle {
 	name, _ := syscall.UTF16FromString(pName)
 	var prHandle syscall.Handle
@@ -160,4 +186,17 @@ func enumForms(printerHandle syscall.Handle, level uint32, forms []formInfo2,
 		return nil, err
 	}
 	return forms, nil
+}
+
+// setPrinter sets the data for the specified printer.
+func setPrinter(printerHandle syscall.Handle, pi8 unsafe.Pointer) {
+	if printerHandle != 0 {
+		r1, _, err := procSetPrinter.Call(uintptr(printerHandle),
+			8,
+			uintptr(pi8),
+			0)
+		if r1 == 0 {
+			fyne.LogError("Error in setPrinter call: ", err)
+		}
+	}
 }

@@ -3,6 +3,7 @@
 package print
 
 import (
+	"fmt"
 	"syscall"
 	"unsafe"
 
@@ -80,6 +81,7 @@ var (
 	procCreateDC      = modgdi32.NewProc("CreateDCW")
 	procDeleteDC      = modgdi32.NewProc("DeleteDC")
 	procGetDeviceCaps = modgdi32.NewProc("GetDeviceCaps")
+	procResetDC       = modgdi32.NewProc("ResetDCW")
 )
 
 // createDC creates a device context for the named printer.
@@ -108,7 +110,23 @@ func deleteDC(dc syscall.Handle) {
 	procDeleteDC.Call(uintptr(dc))
 }
 
+// getDeviceCaps retrieves printer-specific information. See
+// https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getdevicecaps
+// for a list of all information that can be queried.
 func getDeviceCaps(dc syscall.Handle, item int32) int32 {
 	r1, _, _ := procGetDeviceCaps.Call(uintptr(dc), uintptr(item))
 	return int32(r1)
+}
+
+// resetDC updates the printer device context with the information provided in the
+// specified DEVMODE.
+func resetDC(dc syscall.Handle, dMode *devMode) {
+	r1, _, err := procResetDC.Call(uintptr(dc), uintptr(unsafe.Pointer(dMode)))
+	if r1 == 0 {
+		fyne.LogError("ResetDC failed: ", err)
+	}
+	if syscall.Handle(r1) != dc {
+		err = fmt.Errorf("mismatched device contexts")
+		fyne.LogError("ResetDC failure: ", err)
+	}
 }
