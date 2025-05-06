@@ -23,9 +23,7 @@ type Printer struct {
 	handle     syscall.Handle
 	dc         syscall.Handle
 	forms      []formInfo2
-	mediaNames []string
 	mediaSizes MediaSizes
-	papers     []uint16
 }
 
 // newPrinter creates a Printer struct based on information provided in the PrinterInfo2 argument.
@@ -40,12 +38,7 @@ func newPrinter(pInfo2 *PrinterInfo2) *Printer {
 		p.dc = createDC(p.pi2.PrinterName())
 		p.getPrinterInfo8()
 		fmt.Print(p.pi8.String())
-		//
-		//	p.forms = make([]formInfo2, 1)
-		//p.getMediaSizes()
-		p.mediaNames, _ = p.getMedia()
-		//	p.getPaperSizes()
-		p.getPapers()
+		p.mediaSizes, _ = p.getMedia()
 	}
 	return p
 }
@@ -128,11 +121,26 @@ func (pr *Printer) String() string {
 	}
 }*/
 
-func (p *Printer) getMedia() ([]string, error) {
+// getMedia retrieves the printer's media sizes. Only the names and the papersize numbers
+// are retrieved.
+func (p *Printer) getMedia() (MediaSizes, error) {
+	var sizes MediaSizes
 	names, err := p.getPaperNames()
-	return names, err
+	if err != nil {
+		return sizes, err
+	}
+	papers, err := p.getPapers()
+	if err != nil {
+		return sizes, err
+	}
+	sizes = make([]MediaSize, len(names))
+	for i := 0; i < len(names); i++ {
+		sizes[i] = newMediaSize(names[i], paperSize(papers[i]))
+	}
+	return sizes, err
 }
 
+// getPaperNames retrieves the names of all media sizes supported by a printer.
 func (p *Printer) getPaperNames() ([]string, error) {
 	var mNames []string
 	// get number of paper names
@@ -204,7 +212,10 @@ func (p *Printer) getPaperNames() ([]string, error) {
 		return nil
 	}
 */
-func (p *Printer) getPapers() error {
+
+// getPapers retrieves the media number for all media sizes supported by the printer.
+func (p *Printer) getPapers() ([]uint16, error) {
+	var papers []uint16
 	// get number of paper sizes
 	num, err := deviceCapabilities(p.pi2.PrinterName(),
 		p.pi2.PortName(),
@@ -216,23 +227,23 @@ func (p *Printer) getPapers() error {
 			err = errors.New("function unsupported, or general error")
 		}
 		fyne.LogError("Error getting paper sizes", err)
-		return err
+		return papers, err
 	}
 	if num > 0 {
 		// get paper sizes
-		p.papers = make([]uint16, num)
+		papers = make([]uint16, num)
 		num2, err := deviceCapabilities(p.pi2.PrinterName(),
 			p.pi2.PortName(),
 			C.DC_PAPERS,
-			uintptr(unsafe.Pointer(&p.papers[0])),
+			uintptr(unsafe.Pointer(&papers[0])),
 			p.pi2.DevMode())
 		if num2 != num {
 			numErr := fmt.Errorf("returned paper sizes count (%d) does not match number available (%d)",
 				num2, num)
 			fyne.LogError("Error getting paper names", numErr)
-			return err
+			return papers, err
 		}
-		p.mediaSizes = make([]MediaSize, num)
+		//		p.mediaSizes = make([]MediaSize, num)
 		/*		for i := 0; i < int(num); i++ {
 				p.mediaSizes[i] = newMediaSize(p.mediaNames[i], paperSize(p.papers[i]))
 				p.pi8.pDevMode.dmFields = 0
@@ -250,7 +261,7 @@ func (p *Printer) getPapers() error {
 				p.mediaSizes[i].setData(w, h, iW, iH, l, t)
 			}*/
 	}
-	return nil
+	return papers, err
 }
 
 func (p *Printer) getPrinterInfo8() {
