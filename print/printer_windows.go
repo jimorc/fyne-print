@@ -43,7 +43,7 @@ func newPrinter(pInfo2 *PrinterInfo2) *Printer {
 		//
 		//	p.forms = make([]formInfo2, 1)
 		//p.getMediaSizes()
-		p.getPaperNames()
+		p.mediaNames, _ = p.getMedia()
 		//	p.getPaperSizes()
 		p.getPapers()
 	}
@@ -60,13 +60,13 @@ func (pr *Printer) String() string {
 		s.WriteString(fmt.Sprintf("    DC: %d\n", pr.dc))
 		s.WriteString(prepend("    ", pr.pi2.String()))
 		s.WriteString(prepend("    ", pr.pi8.String()))
-		/*				s.WriteString(fmt.Sprintf("    For current paper size, width = %d\n", getDeviceCaps(pr.dc, C.PHYSICALWIDTH)))
-						s.WriteString(fmt.Sprintf("    For current paper size, height = %d\n", getDeviceCaps(pr.dc, C.PHYSICALHEIGHT)))
-						s.WriteString(fmt.Sprintf("    For current paper size, left offset = %d\n", getDeviceCaps(pr.dc, C.PHYSICALOFFSETX)))
-						s.WriteString(fmt.Sprintf("    For current paper size, top offset = %d\n", getDeviceCaps(pr.dc, C.PHYSICALOFFSETY)))
-						s.WriteString(fmt.Sprintf("    For current paper size, printable width = %d\n", getDeviceCaps(pr.dc, C.HORZRES)))
-						s.WriteString(fmt.Sprintf("    For current paper size, printable height = %d\n", getDeviceCaps(pr.dc, C.VERTRES)))
-		*/
+		s.WriteString(fmt.Sprintf("    For current paper size, width = %d\n", getDeviceCaps(pr.dc, C.PHYSICALWIDTH)))
+		s.WriteString(fmt.Sprintf("    For current paper size, height = %d\n", getDeviceCaps(pr.dc, C.PHYSICALHEIGHT)))
+		s.WriteString(fmt.Sprintf("    For current paper size, left offset = %d\n", getDeviceCaps(pr.dc, C.PHYSICALOFFSETX)))
+		s.WriteString(fmt.Sprintf("    For current paper size, top offset = %d\n", getDeviceCaps(pr.dc, C.PHYSICALOFFSETY)))
+		s.WriteString(fmt.Sprintf("    For current paper size, printable width = %d\n", getDeviceCaps(pr.dc, C.HORZRES)))
+		s.WriteString(fmt.Sprintf("    For current paper size, printable height = %d\n", getDeviceCaps(pr.dc, C.VERTRES)))
+
 		s.WriteString(fmt.Sprintf("    Printer has %d Media Sizes:\n", len(pr.mediaSizes)))
 		fmt.Println("Printing media sizes")
 		s.WriteString(pr.mediaSizes.String())
@@ -128,7 +128,13 @@ func (pr *Printer) String() string {
 	}
 }*/
 
-func (p *Printer) getPaperNames() error {
+func (p *Printer) getMedia() ([]string, error) {
+	names, err := p.getPaperNames()
+	return names, err
+}
+
+func (p *Printer) getPaperNames() ([]string, error) {
+	var mNames []string
 	// get number of paper names
 	num, err := deviceCapabilities(p.pi2.PrinterName(),
 		p.pi2.PortName(),
@@ -140,7 +146,7 @@ func (p *Printer) getPaperNames() error {
 			err = errors.New("function unsupported, or general error")
 		}
 		fyne.LogError("Error getting paper names", err)
-		return err
+		return mNames, err
 	}
 	if num > 0 {
 		// get paper names
@@ -154,16 +160,15 @@ func (p *Printer) getPaperNames() error {
 			numErr := fmt.Errorf("returned paper names count (%d) does not match number available (%d)",
 				num2, num)
 			fyne.LogError("Error getting paper names", numErr)
-			return err
+			return mNames, err
 		}
-		fmt.Printf("%d paper names\n", num2)
-		p.mediaNames = make([]string, num2)
+		//		fmt.Printf("%d paper names\n", num2)
+		mNames := make([]string, num2)
 		for i := 0; i < int(num2); i++ {
-			p.mediaNames[i] = syscall.UTF16ToString(names[i][:])
-			fmt.Println(p.mediaNames[i])
+			mNames[i] = syscall.UTF16ToString(names[i][:])
 		}
 	}
-	return nil
+	return mNames, nil
 }
 
 /*
@@ -228,22 +233,22 @@ func (p *Printer) getPapers() error {
 			return err
 		}
 		p.mediaSizes = make([]MediaSize, num)
-		for i := 0; i < int(num); i++ {
-			p.mediaSizes[i] = newMediaSize(p.mediaNames[i], paperSize(p.papers[i]))
-			p.pi8.pDevMode.dmFields = 0
-			p.pi8.pDevMode.setPaperSize(paperSize(p.papers[i]))
-			pi8 := unsafe.Pointer(&p.pi8)
-			setPrinter(p.handle, pi8)
-			resetDC(p.dc, p.pi8.pDevMode)
-			p.getPrinterInfo8()
-			w := float32(getDeviceCaps(p.dc, C.PHYSICALWIDTH))
-			h := float32(getDeviceCaps(p.dc, C.PHYSICALHEIGHT))
-			l := float32(getDeviceCaps(p.dc, C.PHYSICALOFFSETX))
-			t := float32(getDeviceCaps(p.dc, C.PHYSICALOFFSETY))
-			iW := float32(getDeviceCaps(p.dc, C.HORZRES))
-			iH := float32(getDeviceCaps(p.dc, C.VERTRES))
-			p.mediaSizes[i].setData(w, h, iW, iH, l, t)
-		}
+		/*		for i := 0; i < int(num); i++ {
+				p.mediaSizes[i] = newMediaSize(p.mediaNames[i], paperSize(p.papers[i]))
+				p.pi8.pDevMode.dmFields = 0
+				p.pi8.pDevMode.setPaperSize(paperSize(p.papers[i]))
+				pi8 := unsafe.Pointer(&p.pi8)
+				setPrinter(p.handle, pi8)
+				resetDC(p.dc, p.pi8.pDevMode)
+				p.getPrinterInfo8()
+				w := float32(getDeviceCaps(p.dc, C.PHYSICALWIDTH))
+				h := float32(getDeviceCaps(p.dc, C.PHYSICALHEIGHT))
+				l := float32(getDeviceCaps(p.dc, C.PHYSICALOFFSETX))
+				t := float32(getDeviceCaps(p.dc, C.PHYSICALOFFSETY))
+				iW := float32(getDeviceCaps(p.dc, C.HORZRES))
+				iH := float32(getDeviceCaps(p.dc, C.VERTRES))
+				p.mediaSizes[i].setData(w, h, iW, iH, l, t)
+			}*/
 	}
 	return nil
 }
