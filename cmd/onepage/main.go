@@ -21,7 +21,6 @@ func main() {
 	printOp := print.NewPrintOperation(w)
 	fileMenu := fyne.NewMenu("File",
 		fyne.NewMenuItem("Page Setup", func() {
-			var psd *print.PageSetupDialog
 			psd, err := printOp.PageSetupDialog()
 			if err != nil {
 				dialog.ShowError(err, w)
