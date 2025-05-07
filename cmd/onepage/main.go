@@ -8,6 +8,7 @@ import (
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/driver/software"
 	"fyne.io/fyne/v2/widget"
 
@@ -20,8 +21,13 @@ func main() {
 	printOp := print.NewPrintOperation(w)
 	fileMenu := fyne.NewMenu("File",
 		fyne.NewMenuItem("Page Setup", func() {
-			pSetup := printOp.PageSetupDialog()
-			pSetup.Show()
+			var psd *print.PageSetupDialog
+			psd, err := printOp.PageSetupDialog()
+			if err != nil {
+				dialog.ShowError(err, w)
+				return
+			}
+			psd.Show()
 		}),
 		fyne.NewMenuItem("Quit", func() {
 			w.Close()

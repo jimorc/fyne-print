@@ -72,3 +72,11 @@ func (p *Printers) ClosePrinters() {
 		printer.close()
 	}
 }
+
+func (p *Printers) Names() []string {
+	names := make([]string, 0, len(*p))
+	for _, printer := range *p {
+		names = append(names, printer.Name())
+	}
+	return names
+}

@@ -43,6 +43,11 @@ func newPrinter(pInfo2 *PrinterInfo2) *Printer {
 	return p
 }
 
+// Name retrieves the printer's name as specified by win32.
+func (pr *Printer) Name() string {
+	return pr.pi2.PrinterName()
+}
+
 // String returns a string representation of the Printer struct.
 func (pr *Printer) String() string {
 	var s strings.Builder

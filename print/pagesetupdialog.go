@@ -1,6 +1,8 @@
 package print
 
 import (
+	"errors"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
@@ -38,9 +40,9 @@ type PageSetupInfo struct {
 // PageSetupDialog is a ConfirmDialog dialog with widgets that must be saved.
 type PageSetupDialog struct {
 	*dialog.ConfirmDialog
-	pageSetupInfo *PageSetupInfo
-	parent        fyne.Window
-	//	printers              *Printers
+	pageSetupInfo         *PageSetupInfo
+	parent                fyne.Window
+	printers              *Printers
 	printerSelect         *widget.Select
 	location              *widget.Label
 	comment               *widget.Label
@@ -53,7 +55,7 @@ type PageSetupDialog struct {
 // Params:
 //
 //	parent is the parent window for the dialog.
-func NewPageSetupDialog(parent fyne.Window, psInfo *PageSetupInfo) *dialog.ConfirmDialog {
+func NewPageSetupDialog(parent fyne.Window, psInfo *PageSetupInfo) *PageSetupDialog {
 	psd := &PageSetupDialog{}
 	if psInfo == nil {
 		psInfo = &PageSetupInfo{}
@@ -64,7 +66,7 @@ func NewPageSetupDialog(parent fyne.Window, psInfo *PageSetupInfo) *dialog.Confi
 	psd.ConfirmDialog = dialog.NewCustomConfirm("PageSetup", "OK",
 		"Cancel", printerContainer, func(bool) {}, parent)
 	psd.Resize(fyne.NewSize(500, 300))
-	return psd.ConfirmDialog
+	return psd
 
 }
 
@@ -83,7 +85,7 @@ func (psd *PageSetupDialog) createPrinterContainer() *fyne.Container {
 	orLabel := widget.NewLabel("Orientation")
 	psd.orientationRadioGroup = widget.NewRadioGroup([]string{"Portrait", "Landscape"}, nil)
 	psd.orientationRadioGroup.Horizontal = true
-	psd.populatePrinterSelect(psd.parent)
+	//	psd.populatePrinterSelect(psd.parent)
 	prC := container.New(xlayout.NewHPortion([]float64{30, 70}), prLabel, psd.printerSelect)
 	prLocC := container.New(xlayout.NewHPortion([]float64{30, 70}), locLabel, psd.location)
 	prCommentC := container.New(xlayout.NewHPortion([]float64{30, 70}), commentLabel, psd.comment)
@@ -93,23 +95,22 @@ func (psd *PageSetupDialog) createPrinterContainer() *fyne.Container {
 	return box
 }
 
-func (psd *PageSetupDialog) populatePrinterSelect(parent fyne.Window) {
-	/*	ps := NewPrinters()
-		if len(ps.Printers) == 0 {
-			err := errors.New("no printers were found")
-			fyne.LogError("", err)
-			err1 := errors.New(err.Error() +
-				"\nCannot continue page setup.")
-			dialog.ShowError(err1, parent)
-			return
-		}
-		psd.printers = ps
+func (psd *PageSetupDialog) populatePrinterSelect() error {
+	ps := NewPrinters()
+	psd.printers = ps
 
-		prNames := psd.printers.PrinterNames()
-		psd.printerSelect.Options = prNames
+	prNames := psd.printers.Names()
+	if len(prNames) == 0 {
+		err := errors.New("no printers were found")
+		fyne.LogError("Check printer configuration", err)
+		err1 := errors.New(err.Error() +
+			"\nCannot continue page setup.")
+		return err1
+	}
+	psd.printerSelect.Options = prNames
 
-		// set selected
-
+	// set selected
+	/*
 		if len(prNames) > 0 {
 			if psd.pageSetupInfo.printer != nil {
 				psd.printerSelect.SetSelected(psd.pageSetupInfo.printer.Name())
@@ -121,8 +122,8 @@ func (psd *PageSetupDialog) populatePrinterSelect(parent fyne.Window) {
 					psd.printerSelect.SetSelected(defPr.Name())
 				}
 			}
-		}
-	*/
+		}*/
+	return nil
 }
 
 func (psd *PageSetupDialog) printerSelected(name string) {
