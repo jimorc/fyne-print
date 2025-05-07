@@ -4,10 +4,8 @@ import (
 	"errors"
 
 	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
-	xlayout "fyne.io/x/fyne/layout"
 )
 
 // PageSetupInfo contains information used to initialize the widgets in the PageSetupDialog and
@@ -39,7 +37,7 @@ type PageSetupInfo struct {
 
 // PageSetupDialog is a ConfirmDialog dialog with widgets that must be saved.
 type PageSetupDialog struct {
-	*dialog.ConfirmDialog
+	*dialog.CustomDialog
 	pageSetupInfo         *PageSetupInfo
 	parent                fyne.Window
 	printers              *Printers
@@ -54,7 +52,11 @@ type PageSetupDialog struct {
 //
 // Params:
 //
-//	parent is the parent window for the dialog.
+//		parent is the parent window for the dialog.
+//	 psInfo is the PageSetupInfo struct containing the data to initialize the dialog's
+//
+// widgets to. If nil is passed, then an initialized PageSetupInfo struct is created.
+// The contents of the dialog is saved to the struct when the dialog's submit button is clicked.
 func NewPageSetupDialog(parent fyne.Window, psInfo *PageSetupInfo) *PageSetupDialog {
 	psd := &PageSetupDialog{}
 	if psInfo == nil {
@@ -62,39 +64,39 @@ func NewPageSetupDialog(parent fyne.Window, psInfo *PageSetupInfo) *PageSetupDia
 	}
 	psd.pageSetupInfo = psInfo
 	psd.parent = parent
-	printerContainer := psd.createPrinterContainer()
-	psd.ConfirmDialog = dialog.NewCustomConfirm("PageSetup", "OK",
-		"Cancel", printerContainer, func(bool) {}, parent)
+	psd.CustomDialog = psd.createDialog()
 	psd.Resize(fyne.NewSize(500, 300))
 	return psd
 
 }
 
-// createPrinterContainer creates the container that holds the printers select and label.
-func (psd *PageSetupDialog) createPrinterContainer() *fyne.Container {
-	prLabel := widget.NewLabel("Format For")
+// createFormDialog creates the dialog containing PageSetup properties.
+func (psd *PageSetupDialog) createDialog() *dialog.CustomDialog {
 	psd.printerSelect = widget.NewSelect([]string{}, psd.printerSelected)
 	psd.printerSelect.Alignment = fyne.TextAlignTrailing
-	locLabel := widget.NewLabel("Location")
+	printerFI := widget.NewFormItem("Format For", psd.printerSelect)
 	psd.location = widget.NewLabel("")
-	commentLabel := widget.NewLabel("Comment")
+	locFI := widget.NewFormItem("Location", psd.location)
 	psd.comment = widget.NewLabel("")
-	psLabel := widget.NewLabel("Paper Size")
+	commentFI := widget.NewFormItem("Comment", psd.comment)
 	psd.paperSizeSelect = widget.NewSelect([]string{}, nil)
+	paperSizeFI := widget.NewFormItem("Paper Size", psd.paperSizeSelect)
 	psd.paperSizeSelect.Alignment = fyne.TextAlignTrailing
-	orLabel := widget.NewLabel("Orientation")
 	psd.orientationRadioGroup = widget.NewRadioGroup([]string{"Portrait", "Landscape"}, nil)
 	psd.orientationRadioGroup.Horizontal = true
-	//	psd.populatePrinterSelect(psd.parent)
-	prC := container.New(xlayout.NewHPortion([]float64{30, 70}), prLabel, psd.printerSelect)
-	prLocC := container.New(xlayout.NewHPortion([]float64{30, 70}), locLabel, psd.location)
-	prCommentC := container.New(xlayout.NewHPortion([]float64{30, 70}), commentLabel, psd.comment)
-	psC := container.New(xlayout.NewHPortion([]float64{30, 70}), psLabel, psd.paperSizeSelect)
-	orC := container.New(xlayout.NewHPortion([]float64{30, 70}), orLabel, psd.orientationRadioGroup)
-	box := container.NewVBox(prC, prLocC, prCommentC, psC, orC)
-	return box
+	orientationFI := widget.NewFormItem("Orientation", psd.orientationRadioGroup)
+
+	form := widget.NewForm(printerFI, locFI, commentFI, paperSizeFI, orientationFI)
+	form.OnCancel = psd.onCancel
+	form.OnSubmit = psd.onSubmit
+	form.SubmitText = "Accept"
+	d := dialog.NewCustomWithoutButtons("Page Setup", form, psd.parent)
+	return d
 }
 
+// populatePrinterSelect populates the printerSelect with the names of all available printers
+// and sets the selected item to the previously set printer, the only printer, or the user's
+// default printer if set.
 func (psd *PageSetupDialog) populatePrinterSelect() error {
 	ps := NewPrinters()
 	psd.printers = ps
@@ -153,4 +155,15 @@ func (psd *PageSetupDialog) printerSelected(name string) {
 						}
 					}
 				}*/
+}
+
+// onCancel handles cancel button clicks. It just hides the dialog.
+func (psd *PageSetupDialog) onCancel() {
+	psd.Hide()
+}
+
+// onSubmit handles the submit button clicks. It stores values in the PageSetup
+// struct and hides the dialog.
+func (psd *PageSetupDialog) onSubmit() {
+	psd.Hide()
 }
