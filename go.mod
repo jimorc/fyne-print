@@ -3,7 +3,7 @@ module github.com/jimorc/fyne-print
 go 1.19
 
 require (
-	fyne.io/fyne/v2 v2.6.0
+	fyne.io/fyne/v2 v2.6.1
 	github.com/OpenPrinting/goipp v1.1.0
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/sys v0.30.0
